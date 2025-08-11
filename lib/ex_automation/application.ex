@@ -11,6 +11,7 @@ defmodule ExAutomation.Application do
       ExAutomationWeb.Telemetry,
       ExAutomation.Repo,
       {DNSCluster, query: Application.get_env(:ex_automation, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:ex_automation, Oban)},
       {Phoenix.PubSub, name: ExAutomation.PubSub},
       # Start a worker by calling: ExAutomation.Worker.start_link(arg)
       # {ExAutomation.Worker, arg},

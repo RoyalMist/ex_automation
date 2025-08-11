@@ -1,4 +1,5 @@
 import Config
+config :ex_automation, Oban, testing: :manual
 
 # Configure your database
 #

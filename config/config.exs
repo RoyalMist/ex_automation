@@ -7,6 +7,12 @@
 # General application configuration
 import Config
 
+config :ex_automation, Oban,
+  engine: Oban.Engines.Basic,
+  notifier: Oban.Notifiers.Postgres,
+  queues: [default: 10],
+  repo: ExAutomation.Repo
+
 config :ex_automation,
   ecto_repos: [ExAutomation.Repo],
   generators: [timestamp_type: :utc_datetime]
