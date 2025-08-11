@@ -39,6 +39,9 @@ defmodule ExAutomationWeb.Router do
 
       live_dashboard "/dashboard", metrics: ExAutomationWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+
+      import Oban.Web.Router
+      oban_dashboard("/oban")
     end
   end
 end
