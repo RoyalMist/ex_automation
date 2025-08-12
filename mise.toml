@@ -13,7 +13,7 @@ run = "rm -rf priv/static erl_crash.dump deps _build .elixir_ls && mix deps.get 
 
 [tasks."dev:setup"]
 description = "Setup dev environment"
-run = "mix deps.get && bundle install"
+run = "mix setup && bundle install"
 
 [tasks."production:iex"]
 description = "Open a remote iex session on the production app"
