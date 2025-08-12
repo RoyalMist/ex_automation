@@ -2,3 +2,35 @@
 elixir = "1.18.4"
 erlang = "28.0.2"
 ruby = "3.4.5"
+
+[tasks."dev:gettext"]
+description = "Update PO files"
+run = "mix gettext.extract --merge"
+
+[tasks."dev:reset"]
+description = "Reset and recompile project"
+run = "rm -rf priv/static erl_crash.dump deps _build .elixir_ls && mix deps.get && mix && mix test"
+
+[tasks."dev:setup"]
+description = "Setup dev environment"
+run = "mix deps.get && bundle install"
+
+[tasks."production:iex"]
+description = "Open a remote iex session on the production app"
+run = "bundle exec kamal iex"
+
+[tasks."production:logs"]
+description = "Tail application logs"
+run = "bundle exec kamal logs"
+
+[tasks."production:proxy"]
+description = "Upgrade Kamal Proxy"
+run = "bundle exec kamal proxy upgrade"
+
+[tasks."production:shell"]
+description = "Open SSH shell on the container"
+run = "bundle exec kamal shell"
+
+[tasks."production:ssh"]
+description = "Open SSH shell on the server"
+run = "bundle exec kamal server exec --interactive \"/bin/bash\""
