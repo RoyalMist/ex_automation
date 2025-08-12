@@ -6,13 +6,14 @@ defmodule ExAutomation.Gitlab.Release do
     field :name, :string
     field :date, :naive_datetime
     field :description, :string
+    field :tags, {:array, :string}, default: []
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(release, attrs) do
     release
-    |> cast(attrs, [:name, :date, :description])
+    |> cast(attrs, [:name, :date, :description, :tags])
     |> validate_required([:name, :date, :description])
     |> unique_constraint(:name)
   end

@@ -35,6 +35,17 @@ config :ex_automation, ExAutomationWeb.Endpoint,
 
 config :ex_automation, ExAutomation.Mailer, adapter: Swoosh.Adapters.Local
 
+config :ex_automation, Oban,
+  repo: ExAutomation.Repo,
+  queues: [gitlab: 5, jira: 2],
+  plugins: [
+    Oban.Plugins.Pruner,
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"@reboot", ExAutomation.Jobs.GitlabFetchReleasesWorker}
+     ]}
+  ]
+
 config :esbuild,
   version: "0.25.4",
   ex_automation: [

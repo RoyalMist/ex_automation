@@ -7,7 +7,7 @@ defmodule ExAutomation.GitlabTest do
 
     import ExAutomation.GitlabFixtures
 
-    @invalid_attrs %{name: nil, date: nil, description: nil}
+    @invalid_attrs %{name: nil, date: nil, description: nil, tags: nil}
 
     test "list_releases/0 returns all releases" do
       release = release_fixture()
@@ -37,13 +37,15 @@ defmodule ExAutomation.GitlabTest do
       valid_attrs = %{
         name: "some name",
         date: ~N[2025-08-11 08:34:00],
-        description: "some description"
+        description: "some description",
+        tags: ["v1.0", "stable", "production"]
       }
 
       assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
       assert release.name == "some name"
       assert release.date == ~N[2025-08-11 08:34:00]
       assert release.description == "some description"
+      assert release.tags == ["v1.0", "stable", "production"]
     end
 
     test "create_release/1 with invalid data returns error changeset" do
@@ -56,13 +58,15 @@ defmodule ExAutomation.GitlabTest do
       update_attrs = %{
         name: "some updated name",
         date: ~N[2025-08-12 08:34:00],
-        description: "some updated description"
+        description: "some updated description",
+        tags: ["v2.0", "updated"]
       }
 
       assert {:ok, %Release{} = release} = Gitlab.update_release(release, update_attrs)
       assert release.name == "some updated name"
       assert release.date == ~N[2025-08-12 08:34:00]
       assert release.description == "some updated description"
+      assert release.tags == ["v2.0", "updated"]
     end
 
     test "update_release/2 with invalid data returns error changeset" do
@@ -88,7 +92,8 @@ defmodule ExAutomation.GitlabTest do
       duplicate_attrs = %{
         name: release.name,
         date: ~N[2025-08-12 08:34:00],
-        description: "another description"
+        description: "another description",
+        tags: ["duplicate"]
       }
 
       assert {:error, %Ecto.Changeset{} = changeset} = Gitlab.create_release(duplicate_attrs)
@@ -142,7 +147,8 @@ defmodule ExAutomation.GitlabTest do
       valid_attrs = %{
         name: "broadcast test release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description"
+        description: "test description",
+        tags: ["broadcast"]
       }
 
       {:ok, release} = Gitlab.create_release(valid_attrs)
@@ -209,7 +215,8 @@ defmodule ExAutomation.GitlabTest do
       valid_attrs = %{
         name: "timestamp test release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description"
+        description: "test description",
+        tags: ["timestamp"]
       }
 
       {:ok, release} = Gitlab.create_release(valid_attrs)
@@ -217,6 +224,150 @@ defmodule ExAutomation.GitlabTest do
       assert %DateTime{} = release.inserted_at
       assert %DateTime{} = release.updated_at
       assert release.inserted_at == release.updated_at
+    end
+
+    test "create_release/1 with empty tags creates release with empty array" do
+      valid_attrs = %{
+        name: "empty tags release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "test description",
+        tags: []
+      }
+
+      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
+      assert release.tags == []
+    end
+
+    test "create_release/1 without tags field defaults to empty array" do
+      valid_attrs = %{
+        name: "no tags release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "test description"
+      }
+
+      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
+      assert release.tags == []
+    end
+
+    test "update_release/2 can update tags" do
+      release = release_fixture()
+      update_attrs = %{tags: ["new", "tags", "array"]}
+
+      assert {:ok, %Release{} = updated_release} = Gitlab.update_release(release, update_attrs)
+      assert updated_release.tags == ["new", "tags", "array"]
+    end
+
+    test "update_release/2 can clear tags" do
+      release = release_fixture(%{tags: ["existing", "tags"]})
+      update_attrs = %{tags: []}
+
+      assert {:ok, %Release{} = updated_release} = Gitlab.update_release(release, update_attrs)
+      assert updated_release.tags == []
+    end
+
+    test "changeset accepts valid tags array" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: ["tag1", "tag2", "tag3"]
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      assert changeset.changes.tags == ["tag1", "tag2", "tag3"]
+    end
+
+    test "changeset accepts empty tags array" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: []
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      # Empty array is not considered a change if the default is also empty
+      # So we check that tags field exists and is empty in the data
+      assert Map.get(changeset.changes, :tags, []) == []
+    end
+
+    test "changeset handles nil tags gracefully" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: nil
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      # nil tags should be cast and will appear in changes
+      assert changeset.changes.tags == nil
+    end
+
+    test "changeset validates tags as list of strings" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: ["string1", "string2", "string3"]
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      assert changeset.changes.tags == ["string1", "string2", "string3"]
+    end
+
+    test "create_release/1 handles duplicate tags" do
+      valid_attrs = %{
+        name: "duplicate tags release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "test description",
+        tags: ["tag1", "tag1", "tag2", "tag2"]
+      }
+
+      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
+      # Should preserve duplicates as provided
+      assert release.tags == ["tag1", "tag1", "tag2", "tag2"]
+    end
+
+    test "create_release/1 handles very long tags array" do
+      long_tags = Enum.map(1..100, fn i -> "tag#{i}" end)
+
+      valid_attrs = %{
+        name: "long tags release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "test description",
+        tags: long_tags
+      }
+
+      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
+      assert length(release.tags) == 100
+      assert "tag1" in release.tags
+      assert "tag100" in release.tags
+    end
+
+    test "update_release/2 preserves other fields when updating tags" do
+      release =
+        release_fixture(%{
+          name: "original name",
+          description: "original description",
+          tags: ["original", "tags"]
+        })
+
+      update_attrs = %{tags: ["new", "tags"]}
+
+      assert {:ok, %Release{} = updated_release} = Gitlab.update_release(release, update_attrs)
+      assert updated_release.tags == ["new", "tags"]
+      assert updated_release.name == "original name"
+      assert updated_release.description == "original description"
+      assert updated_release.date == release.date
     end
   end
 end
