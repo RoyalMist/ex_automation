@@ -40,6 +40,7 @@ defmodule ExAutomation.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.0"},
       {:mix_audit, "~> 2.0"},
       {:sobelow, "~> 0.14"},
