@@ -17,5 +17,6 @@ defmodule ExAutomation.Jira.Issue do
     issue
     |> cast(attrs, [:key, :parent_key, :summary, :status, :type])
     |> validate_required([:key, :parent_key, :summary, :status, :type])
+    |> unique_constraint(:key)
   end
 end

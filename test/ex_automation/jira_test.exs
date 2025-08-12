@@ -202,5 +202,20 @@ defmodule ExAutomation.JiraTest do
       issue = issue_fixture()
       assert %Ecto.Changeset{} = Jira.change_issue(issue)
     end
+
+    test "create_issue/1 with duplicate key returns error changeset" do
+      issue = issue_fixture()
+
+      duplicate_attrs = %{
+        key: issue.key,
+        parent_key: "some other parent_key",
+        status: "some other status",
+        summary: "some other summary",
+        type: "some other type"
+      }
+
+      assert {:error, %Ecto.Changeset{} = changeset} = Jira.create_issue(duplicate_attrs)
+      assert "has already been taken" in errors_on(changeset).key
+    end
   end
 end

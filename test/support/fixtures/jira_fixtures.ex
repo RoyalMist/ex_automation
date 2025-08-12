@@ -8,9 +8,11 @@ defmodule ExAutomation.JiraFixtures do
   Generate a issue.
   """
   def issue_fixture(attrs \\ %{}) do
+    unique_id = System.unique_integer([:positive])
+
     attrs =
       Enum.into(attrs, %{
-        key: "some key",
+        key: "some key #{unique_id}",
         parent_key: "some parent_key",
         status: "some status",
         summary: "some summary",
