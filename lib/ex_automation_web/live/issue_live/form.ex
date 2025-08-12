@@ -59,7 +59,9 @@ defmodule ExAutomationWeb.IssueLive.Form do
 
   @impl true
   def handle_event("validate", %{"issue" => issue_params}, socket) do
-    changeset = Jira.change_issue(socket.assigns.current_scope, socket.assigns.issue, issue_params)
+    changeset =
+      Jira.change_issue(socket.assigns.current_scope, socket.assigns.issue, issue_params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 

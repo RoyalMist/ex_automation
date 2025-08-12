@@ -68,6 +68,7 @@ defmodule ExAutomationWeb.IssueLive.Index do
   @impl true
   def handle_info({type, %ExAutomation.Jira.Issue{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :issues, Jira.list_issues(socket.assigns.current_scope), reset: true)}
+    {:noreply,
+     stream(socket, :issues, Jira.list_issues(socket.assigns.current_scope), reset: true)}
   end
 end

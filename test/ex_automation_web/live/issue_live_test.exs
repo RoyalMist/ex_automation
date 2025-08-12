@@ -4,8 +4,20 @@ defmodule ExAutomationWeb.IssueLiveTest do
   import Phoenix.LiveViewTest
   import ExAutomation.JiraFixtures
 
-  @create_attrs %{status: "some status", type: "some type", key: "some key", parent_key: "some parent_key", summary: "some summary"}
-  @update_attrs %{status: "some updated status", type: "some updated type", key: "some updated key", parent_key: "some updated parent_key", summary: "some updated summary"}
+  @create_attrs %{
+    status: "some status",
+    type: "some type",
+    key: "some key",
+    parent_key: "some parent_key",
+    summary: "some summary"
+  }
+  @update_attrs %{
+    status: "some updated status",
+    type: "some updated type",
+    key: "some updated key",
+    parent_key: "some updated parent_key",
+    summary: "some updated summary"
+  }
   @invalid_attrs %{status: nil, type: nil, key: nil, parent_key: nil, summary: nil}
 
   setup :register_and_log_in_user
