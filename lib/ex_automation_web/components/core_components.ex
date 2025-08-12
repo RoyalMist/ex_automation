@@ -59,11 +59,7 @@ defmodule ExAutomationWeb.CoreComponents do
       class="toast toast-top toast-end z-50"
       {@rest}
     >
-      <div class={[
-        "alert w-80 sm:w-96 max-w-80 sm:max-w-96 text-wrap",
-        @kind == :info && "alert-info",
-        @kind == :error && "alert-error"
-      ]}>
+      <div class={["alert max-w-80 text-wrap w-80 sm:max-w-96 sm:w-96", @kind == :info && "alert-info", @kind == :error && "alert-error"]}>
         <.icon :if={@kind == :info} name="hero-information-circle" class="size-5 shrink-0" />
         <.icon :if={@kind == :error} name="hero-exclamation-circle" class="size-5 shrink-0" />
         <div>
@@ -71,7 +67,7 @@ defmodule ExAutomationWeb.CoreComponents do
           <p>{msg}</p>
         </div>
         <div class="flex-1" />
-        <button type="button" class="group self-start cursor-pointer" aria-label={gettext("close")}>
+        <button type="button" class="group cursor-pointer self-start" aria-label={gettext("close")}>
           <.icon name="hero-x-mark" class="size-5 opacity-40 group-hover:opacity-70" />
         </button>
       </div>
@@ -213,7 +209,7 @@ defmodule ExAutomationWeb.CoreComponents do
         <select
           id={@id}
           name={@name}
-          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+          class={[@class || "select w-full", @errors != [] && (@error_class || "select-error")]}
           multiple={@multiple}
           {@rest}
         >
@@ -234,10 +230,7 @@ defmodule ExAutomationWeb.CoreComponents do
         <textarea
           id={@id}
           name={@name}
-          class={[
-            @class || "w-full textarea",
-            @errors != [] && (@error_class || "textarea-error")
-          ]}
+          class={[@class || "textarea w-full", @errors != [] && (@error_class || "textarea-error")]}
           {@rest}
         >{Phoenix.HTML.Form.normalize_value("textarea", @value)}</textarea>
       </label>
@@ -257,10 +250,7 @@ defmodule ExAutomationWeb.CoreComponents do
           name={@name}
           id={@id}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
-          ]}
+          class={[@class || "input w-full", @errors != [] && (@error_class || "input-error")]}
           {@rest}
         />
       </label>
@@ -272,7 +262,7 @@ defmodule ExAutomationWeb.CoreComponents do
   # Helper used by inputs to generate form errors
   defp error(assigns) do
     ~H"""
-    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
+    <p class="text-error mt-1.5 flex items-center gap-2 text-sm">
       <.icon name="hero-exclamation-circle" class="size-5" />
       {render_slot(@inner_block)}
     </p>
@@ -293,7 +283,7 @@ defmodule ExAutomationWeb.CoreComponents do
         <h1 class="text-lg font-semibold leading-8">
           {render_slot(@inner_block)}
         </h1>
-        <p :if={@subtitle != []} class="text-sm text-base-content/70">
+        <p :if={@subtitle != []} class="text-base-content/70 text-sm">
           {render_slot(@subtitle)}
         </p>
       </div>
@@ -334,7 +324,7 @@ defmodule ExAutomationWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table table-zebra">
+    <table class="table-zebra table">
       <thead>
         <tr>
           <th :for={col <- @col}>{col[:label]}</th>

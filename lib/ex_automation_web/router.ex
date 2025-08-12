@@ -19,44 +19,32 @@ defmodule ExAutomationWeb.Router do
 
   scope "/", ExAutomationWeb do
     pipe_through :browser
-
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ExAutomationWeb do
-  #   pipe_through :api
-  # end
-
-  # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:ex_automation, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
       pipe_through :browser
-
       live_dashboard "/dashboard", metrics: ExAutomationWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
-
-      import Oban.Web.Router
-      oban_dashboard("/oban")
     end
   end
 
-  ## Authentication routes
-
   scope "/", ExAutomationWeb do
+    import Oban.Web.Router
     pipe_through [:browser, :require_authenticated_user]
+    oban_dashboard("/workflows")
 
     live_session :require_authenticated_user,
       on_mount: [{ExAutomationWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/releases", ReleaseLive.Index, :index
+      live "/releases/new", ReleaseLive.Form, :new
+      live "/releases/:id", ReleaseLive.Show, :show
+      live "/releases/:id/edit", ReleaseLive.Form, :edit
     end
 
     post "/users/update-password", UserSessionController, :update_password
