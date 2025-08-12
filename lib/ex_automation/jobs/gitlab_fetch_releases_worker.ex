@@ -3,25 +3,26 @@ defmodule ExAutomation.Jobs.GitlabFetchReleasesWorker do
   alias ExAutomation.Gitlab.Client
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: _}) do
-    %{page: 1}
-    |> __MODULE__.new()
-    |> Oban.insert()
-  end
-
-  @impl Oban.Worker
-  def perform(%Oban.Job{args: %{page: page}}) do
+  def perform(%Oban.Job{args: %{"page" => page}}) do
     token = System.get_env("GITLAB_TOKEN")
     project = System.get_env("GITLAB_PROJECT_ID")
     {:ok, releases} = Client.list_releases(project, token, page: page)
     create_save_job(releases, page)
   end
 
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: _}) do
+    %{page: 1}
+    |> __MODULE__.new()
+    |> Oban.insert()
+  end
+
   defp create_save_job([], _), do: :ok
 
   defp create_save_job(releases, page) do
     for release <- releases do
-      ExAutomation.Jobs.GitlabSaveReleaseWorker.new(release: release)
+      %{release: release}
+      |> ExAutomation.Jobs.GitlabSaveReleaseWorker.new()
       |> Oban.insert()
     end
 
