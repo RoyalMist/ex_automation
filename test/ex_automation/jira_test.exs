@@ -1,5 +1,5 @@
 defmodule ExAutomation.JiraTest do
-  use ExUnit.Case, async: true
+  use ExAutomation.DataCase
   alias ExAutomation.Jira
 
   describe "get_ticket/4" do
@@ -155,7 +155,14 @@ defmodule ExAutomation.JiraTest do
     end
 
     test "create_issue/2 with valid data creates a issue" do
-      valid_attrs = %{status: "some status", type: "some type", key: "some key", parent_key: "some parent_key", summary: "some summary"}
+      valid_attrs = %{
+        status: "some status",
+        type: "some type",
+        key: "some key",
+        parent_key: "some parent_key",
+        summary: "some summary"
+      }
+
       scope = user_scope_fixture()
 
       assert {:ok, %Issue{} = issue} = Jira.create_issue(scope, valid_attrs)
@@ -175,7 +182,14 @@ defmodule ExAutomation.JiraTest do
     test "update_issue/3 with valid data updates the issue" do
       scope = user_scope_fixture()
       issue = issue_fixture(scope)
-      update_attrs = %{status: "some updated status", type: "some updated type", key: "some updated key", parent_key: "some updated parent_key", summary: "some updated summary"}
+
+      update_attrs = %{
+        status: "some updated status",
+        type: "some updated type",
+        key: "some updated key",
+        parent_key: "some updated parent_key",
+        summary: "some updated summary"
+      }
 
       assert {:ok, %Issue{} = issue} = Jira.update_issue(scope, issue, update_attrs)
       assert issue.status == "some updated status"

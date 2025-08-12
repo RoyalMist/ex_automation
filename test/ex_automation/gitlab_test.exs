@@ -1,6 +1,5 @@
 defmodule ExAutomation.GitlabTest do
   use ExAutomation.DataCase
-
   alias ExAutomation.Gitlab
 
   describe "releases" do
