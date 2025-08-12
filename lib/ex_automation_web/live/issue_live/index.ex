@@ -22,7 +22,7 @@ defmodule ExAutomationWeb.IssueLive.Index do
         row_click={fn {_id, issue} -> JS.navigate(~p"/issues/#{issue}") end}
       >
         <:col :let={{_id, issue}} label="Key">{issue.key}</:col>
-        <:col :let={{_id, issue}} label="Parent key">{issue.parent_key}</:col>
+
         <:col :let={{_id, issue}} label="Summary">{issue.summary}</:col>
         <:col :let={{_id, issue}} label="Status">{issue.status}</:col>
         <:col :let={{_id, issue}} label="Type">{issue.type}</:col>

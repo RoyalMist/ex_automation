@@ -134,7 +134,7 @@ defmodule ExAutomation.JiraTest do
 
     import ExAutomation.JiraFixtures
 
-    @invalid_attrs %{status: nil, type: nil, key: nil, parent_key: nil, summary: nil}
+    @invalid_attrs %{status: nil, type: nil, key: nil, summary: nil}
 
     test "list_issues/0 returns all issues" do
       issue = issue_fixture()
@@ -162,7 +162,6 @@ defmodule ExAutomation.JiraTest do
         status: "some status",
         type: "some type",
         key: "some key",
-        parent_key: "some parent_key",
         summary: "some summary"
       }
 
@@ -170,7 +169,6 @@ defmodule ExAutomation.JiraTest do
       assert issue.status == "some status"
       assert issue.type == "some type"
       assert issue.key == "some key"
-      assert issue.parent_key == "some parent_key"
       assert issue.summary == "some summary"
     end
 
@@ -185,7 +183,6 @@ defmodule ExAutomation.JiraTest do
         status: "some updated status",
         type: "some updated type",
         key: "some updated key",
-        parent_key: "some updated parent_key",
         summary: "some updated summary"
       }
 
@@ -193,7 +190,6 @@ defmodule ExAutomation.JiraTest do
       assert issue.status == "some updated status"
       assert issue.type == "some updated type"
       assert issue.key == "some updated key"
-      assert issue.parent_key == "some updated parent_key"
       assert issue.summary == "some updated summary"
     end
 
@@ -219,7 +215,6 @@ defmodule ExAutomation.JiraTest do
 
       duplicate_attrs = %{
         key: issue.key,
-        parent_key: "some other parent_key",
         status: "some other status",
         summary: "some other summary",
         type: "some other type"

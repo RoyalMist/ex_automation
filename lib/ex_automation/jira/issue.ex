@@ -4,7 +4,6 @@ defmodule ExAutomation.Jira.Issue do
 
   schema "issues" do
     field :key, :string
-    field :parent_key, :string
     field :summary, :string
     field :status, :string
     field :type, :string
@@ -15,8 +14,8 @@ defmodule ExAutomation.Jira.Issue do
   @doc false
   def changeset(issue, attrs) do
     issue
-    |> cast(attrs, [:key, :parent_key, :summary, :status, :type])
-    |> validate_required([:key, :parent_key, :summary, :status, :type])
+    |> cast(attrs, [:key, :summary, :status, :type])
+    |> validate_required([:key, :summary, :status, :type])
     |> unique_constraint(:key)
   end
 end

@@ -13,7 +13,6 @@ defmodule ExAutomation.JiraFixtures do
     attrs =
       Enum.into(attrs, %{
         key: "some key #{unique_id}",
-        parent_key: "some parent_key",
         status: "some status",
         summary: "some summary",
         type: "some type"

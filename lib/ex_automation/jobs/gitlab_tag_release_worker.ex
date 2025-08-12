@@ -3,8 +3,8 @@ defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
   alias ExAutomation.Gitlab
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"name" => key}}) do
-    release = Gitlab.get_release_by_name!(key)
+  def perform(%Oban.Job{args: %{"name" => name}}) do
+    release = Gitlab.get_release_by_name!(name)
 
     tags =
       Regex.scan(~r/\b(?!CVE-)[A-Z]{1,10}-\d{1,10}\b/i, release.description || "")
