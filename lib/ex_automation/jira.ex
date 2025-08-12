@@ -195,4 +195,77 @@ defmodule ExAutomation.Jira do
   def change_issue(%Issue{} = issue, attrs \\ %{}) do
     Issue.changeset(issue, attrs)
   end
+
+  @doc """
+  Gets all root issues (issues without a parent).
+
+  ## Examples
+
+      iex> list_root_issues()
+      [%Issue{parent_id: nil}, ...]
+
+  """
+  def list_root_issues() do
+    from(i in Issue, where: is_nil(i.parent_id))
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets all children of a given issue.
+
+  ## Examples
+
+      iex> list_children(issue)
+      [%Issue{parent_id: ^issue_id}, ...]
+
+  """
+  def list_children(%Issue{id: issue_id}) do
+    from(i in Issue, where: i.parent_id == ^issue_id)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets an issue with its parent preloaded.
+
+  ## Examples
+
+      iex> get_issue_with_parent!(123)
+      %Issue{parent: %Issue{}}
+
+  """
+  def get_issue_with_parent!(id) do
+    Issue
+    |> Repo.get_by!(id: id)
+    |> Repo.preload(:parent)
+  end
+
+  @doc """
+  Gets an issue with its children preloaded.
+
+  ## Examples
+
+      iex> get_issue_with_children!(123)
+      %Issue{children: [%Issue{}, ...]}
+
+  """
+  def get_issue_with_children!(id) do
+    Issue
+    |> Repo.get_by!(id: id)
+    |> Repo.preload(:children)
+  end
+
+  @doc """
+  Gets an issue with both parent and children preloaded.
+
+  ## Examples
+
+      iex> get_issue_with_family!(123)
+      %Issue{parent: %Issue{}, children: [%Issue{}, ...]}
+
+  """
+  def get_issue_with_family!(id) do
+    Issue
+    |> Repo.get_by!(id: id)
+    |> Repo.preload([:parent, :children])
+  end
 end

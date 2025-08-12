@@ -15,7 +15,8 @@ defmodule ExAutomation.JiraFixtures do
         key: "some key #{unique_id}",
         status: "some status",
         summary: "some summary",
-        type: "some type"
+        type: "some type",
+        parent_id: nil
       })
 
     {:ok, issue} = ExAutomation.Jira.create_issue(attrs)

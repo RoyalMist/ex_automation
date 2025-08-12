@@ -19,7 +19,7 @@ defmodule ExAutomationWeb.IssueLive.Show do
 
       <.list>
         <:item title="Key">{@issue.key}</:item>
-
+        <:item title="Parent">{if @issue.parent_id, do: "Child Issue", else: "Root Issue"}</:item>
         <:item title="Summary">{@issue.summary}</:item>
         <:item title="Status">{@issue.status}</:item>
         <:item title="Type">{@issue.type}</:item>
