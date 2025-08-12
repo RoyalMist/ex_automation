@@ -1,5 +1,5 @@
 defmodule ExAutomation.Jobs.JiraFetchIssueWorker do
-  use Oban.Worker, queue: :data, priority: 4, max_attempts: 5
+  use Oban.Worker, queue: :data, priority: 4, max_attempts: 2
   alias ExAutomation.Jira
 
   def find_ticket(key) do
