@@ -5,8 +5,8 @@ defmodule ExAutomationWeb.IssueLiveTest do
 
   setup :register_and_log_in_user
 
-  defp create_issue(%{scope: scope}) do
-    issue = issue_fixture(scope)
+  defp create_issue(_) do
+    issue = issue_fixture()
     %{issue: issue}
   end
 

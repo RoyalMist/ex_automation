@@ -8,7 +8,6 @@ defmodule ExAutomation.Jira.Issue do
     field :summary, :string
     field :status, :string
     field :type, :string
-    field :user_id, :id
 
     timestamps(type: :utc_datetime)
   end

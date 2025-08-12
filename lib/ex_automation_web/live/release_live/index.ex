@@ -55,14 +55,6 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    release = Gitlab.get_release!(id)
-    {:ok, _} = Gitlab.delete_release(release)
-
-    {:noreply, stream_delete(socket, :releases, release)}
-  end
-
-  @impl true
   def handle_info({type, %ExAutomation.Gitlab.Release{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, stream(socket, :releases, Gitlab.list_releases(), reset: true)}

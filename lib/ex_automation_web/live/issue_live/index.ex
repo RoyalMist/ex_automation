@@ -57,14 +57,6 @@ defmodule ExAutomationWeb.IssueLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    issue = Jira.get_issue!(id)
-    {:ok, _} = Jira.delete_issue(issue)
-
-    {:noreply, stream_delete(socket, :issues, issue)}
-  end
-
-  @impl true
   def handle_info({type, %ExAutomation.Jira.Issue{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, stream(socket, :issues, Jira.list_issues(), reset: true)}

@@ -39,23 +39,6 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
   end
 
   @impl true
-  def handle_info(
-        {:updated, %ExAutomation.Gitlab.Release{id: id} = release},
-        %{assigns: %{release: %{id: id}}} = socket
-      ) do
-    {:noreply, assign(socket, :release, release)}
-  end
-
-  def handle_info(
-        {:deleted, %ExAutomation.Gitlab.Release{id: id}},
-        %{assigns: %{release: %{id: id}}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> put_flash(:error, "The current release was deleted.")
-     |> push_navigate(to: ~p"/releases")}
-  end
-
   def handle_info({type, %ExAutomation.Gitlab.Release{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, socket}

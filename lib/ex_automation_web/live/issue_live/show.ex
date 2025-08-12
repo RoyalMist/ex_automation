@@ -41,23 +41,6 @@ defmodule ExAutomationWeb.IssueLive.Show do
   end
 
   @impl true
-  def handle_info(
-        {:updated, %ExAutomation.Jira.Issue{id: id} = issue},
-        %{assigns: %{issue: %{id: id}}} = socket
-      ) do
-    {:noreply, assign(socket, :issue, issue)}
-  end
-
-  def handle_info(
-        {:deleted, %ExAutomation.Jira.Issue{id: id}},
-        %{assigns: %{issue: %{id: id}}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> put_flash(:error, "The current issue was deleted.")
-     |> push_navigate(to: ~p"/issues")}
-  end
-
   def handle_info({type, %ExAutomation.Jira.Issue{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, socket}
