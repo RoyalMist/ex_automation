@@ -14,5 +14,6 @@ defmodule ExAutomation.Gitlab.Release do
     release
     |> cast(attrs, [:name, :date, :description])
     |> validate_required([:name, :date, :description])
+    |> unique_constraint(:name)
   end
 end

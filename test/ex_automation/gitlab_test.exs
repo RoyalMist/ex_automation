@@ -70,5 +70,18 @@ defmodule ExAutomation.GitlabTest do
       release = release_fixture()
       assert %Ecto.Changeset{} = Gitlab.change_release(release)
     end
+
+    test "create_release/1 with duplicate name returns error changeset" do
+      release = release_fixture()
+
+      duplicate_attrs = %{
+        name: release.name,
+        date: ~N[2025-08-12 08:34:00],
+        description: "another description"
+      }
+
+      assert {:error, %Ecto.Changeset{} = changeset} = Gitlab.create_release(duplicate_attrs)
+      assert "has already been taken" in errors_on(changeset).name
+    end
   end
 end
