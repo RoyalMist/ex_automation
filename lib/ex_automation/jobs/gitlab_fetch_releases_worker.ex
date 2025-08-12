@@ -1,5 +1,5 @@
 defmodule ExAutomation.Jobs.GitlabFetchReleasesWorker do
-  use Oban.Worker, queue: :gitlab, priority: 1, max_attempts: 5
+  use Oban.Worker, queue: :data, priority: 1, max_attempts: 5
   alias ExAutomation.Gitlab.Client
 
   @impl Oban.Worker

@@ -16,8 +16,15 @@ config :ex_automation, :scopes,
 config :ex_automation, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10],
-  repo: ExAutomation.Repo
+  queues: [data: 5, reports: 2],
+  repo: ExAutomation.Repo,
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 600},
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"@reboot", ExAutomation.Jobs.GitlabFetchReleasesWorker}
+     ]}
+  ]
 
 config :ex_automation,
   ecto_repos: [ExAutomation.Repo],
@@ -34,17 +41,6 @@ config :ex_automation, ExAutomationWeb.Endpoint,
   live_view: [signing_salt: "o1QbZv4e"]
 
 config :ex_automation, ExAutomation.Mailer, adapter: Swoosh.Adapters.Local
-
-config :ex_automation, Oban,
-  repo: ExAutomation.Repo,
-  queues: [gitlab: 5, jira: 2],
-  plugins: [
-    Oban.Plugins.Pruner,
-    {Oban.Plugins.Cron,
-     crontab: [
-       {"@reboot", ExAutomation.Jobs.GitlabFetchReleasesWorker}
-     ]}
-  ]
 
 config :esbuild,
   version: "0.25.4",
