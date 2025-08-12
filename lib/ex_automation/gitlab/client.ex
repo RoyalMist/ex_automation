@@ -1,8 +1,7 @@
-defmodule ExAutomation.GitlabClient do
+defmodule ExAutomation.Gitlab.Client do
   @moduledoc """
   GitLab API client for interacting with GitLab projects and releases.
   """
-
   require Logger
 
   @base_url "https://gitlab.com/api/v4"

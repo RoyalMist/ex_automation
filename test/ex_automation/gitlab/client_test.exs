@@ -1,12 +1,12 @@
-defmodule ExAutomation.GitlabClientTest do
+defmodule ExAutomation.ClientTest do
   use ExUnit.Case, async: true
-  alias ExAutomation.GitlabClient
+  alias ExAutomation.Gitlab.Client
 
   describe "list_releases/3" do
     test "returns error with invalid token" do
       # This test would need to be mocked in a real environment
       # For now, we'll test the function structure
-      assert is_function(&GitlabClient.list_releases/3, 3)
+      assert is_function(&Client.list_releases/3, 3)
     end
 
     test "handles project_id as string path" do

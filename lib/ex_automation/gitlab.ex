@@ -32,6 +32,27 @@ defmodule ExAutomation.Gitlab do
   end
 
   @doc """
+  Fetches releases from GitLab API for a given project.
+
+  ## Parameters
+
+    * `project_id` - The GitLab project ID
+    * `token` - GitLab API token for authentication
+    * `opts` - Optional parameters (default: [])
+
+  ## Examples
+
+      iex> list_releases(123, "glpat-xxxxxxxxxxxxxxxxxxxx")
+      {:ok, [%{...}, ...]}
+
+      iex> list_releases(123, "invalid_token")
+      {:error, :unauthorized}
+
+  """
+  @spec list_releases(integer(), String.t(), keyword()) :: {:ok, list()} | {:error, atom()}
+  defdelegate list_releases(project_id, token, opts \\ []), to: ExAutomation.Gitlab.Client
+
+  @doc """
   Returns the list of releases.
 
   ## Examples
