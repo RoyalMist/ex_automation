@@ -128,4 +128,98 @@ defmodule ExAutomation.JiraTest do
                Keyword.get(client_functions, :get_ticket_with_fields)
     end
   end
+
+  describe "issues" do
+    alias ExAutomation.Jira.Issue
+
+    import ExAutomation.AccountsFixtures, only: [user_scope_fixture: 0]
+    import ExAutomation.JiraFixtures
+
+    @invalid_attrs %{status: nil, type: nil, key: nil, parent_key: nil, summary: nil}
+
+    test "list_issues/1 returns all scoped issues" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      other_issue = issue_fixture(other_scope)
+      assert Jira.list_issues(scope) == [issue]
+      assert Jira.list_issues(other_scope) == [other_issue]
+    end
+
+    test "get_issue!/2 returns the issue with given id" do
+      scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      other_scope = user_scope_fixture()
+      assert Jira.get_issue!(scope, issue.id) == issue
+      assert_raise Ecto.NoResultsError, fn -> Jira.get_issue!(other_scope, issue.id) end
+    end
+
+    test "create_issue/2 with valid data creates a issue" do
+      valid_attrs = %{status: "some status", type: "some type", key: "some key", parent_key: "some parent_key", summary: "some summary"}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Issue{} = issue} = Jira.create_issue(scope, valid_attrs)
+      assert issue.status == "some status"
+      assert issue.type == "some type"
+      assert issue.key == "some key"
+      assert issue.parent_key == "some parent_key"
+      assert issue.summary == "some summary"
+      assert issue.user_id == scope.user.id
+    end
+
+    test "create_issue/2 with invalid data returns error changeset" do
+      scope = user_scope_fixture()
+      assert {:error, %Ecto.Changeset{}} = Jira.create_issue(scope, @invalid_attrs)
+    end
+
+    test "update_issue/3 with valid data updates the issue" do
+      scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      update_attrs = %{status: "some updated status", type: "some updated type", key: "some updated key", parent_key: "some updated parent_key", summary: "some updated summary"}
+
+      assert {:ok, %Issue{} = issue} = Jira.update_issue(scope, issue, update_attrs)
+      assert issue.status == "some updated status"
+      assert issue.type == "some updated type"
+      assert issue.key == "some updated key"
+      assert issue.parent_key == "some updated parent_key"
+      assert issue.summary == "some updated summary"
+    end
+
+    test "update_issue/3 with invalid scope raises" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+
+      assert_raise MatchError, fn ->
+        Jira.update_issue(other_scope, issue, %{})
+      end
+    end
+
+    test "update_issue/3 with invalid data returns error changeset" do
+      scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      assert {:error, %Ecto.Changeset{}} = Jira.update_issue(scope, issue, @invalid_attrs)
+      assert issue == Jira.get_issue!(scope, issue.id)
+    end
+
+    test "delete_issue/2 deletes the issue" do
+      scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      assert {:ok, %Issue{}} = Jira.delete_issue(scope, issue)
+      assert_raise Ecto.NoResultsError, fn -> Jira.get_issue!(scope, issue.id) end
+    end
+
+    test "delete_issue/2 with invalid scope raises" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      assert_raise MatchError, fn -> Jira.delete_issue(other_scope, issue) end
+    end
+
+    test "change_issue/2 returns a issue changeset" do
+      scope = user_scope_fixture()
+      issue = issue_fixture(scope)
+      assert %Ecto.Changeset{} = Jira.change_issue(scope, issue)
+    end
+  end
 end
