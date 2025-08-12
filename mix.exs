@@ -40,6 +40,9 @@ defmodule ExAutomation.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:credo, "~> 1.0"},
+      {:mix_audit, "~> 2.0"},
+      {:sobelow, "~> 0.14"},
       {:bandit, "~> 1.5"},
       {:dns_cluster, "~> 0.2.0"},
       {:ecto_sql, "~> 3.13"},
