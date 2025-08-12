@@ -146,6 +146,17 @@ defmodule ExAutomation.JiraTest do
       assert Jira.get_issue!(issue.id) == issue
     end
 
+    test "get_issue_by_key!/1 returns the issue with given key" do
+      issue = issue_fixture()
+      assert Jira.get_issue_by_key!(issue.key) == issue
+    end
+
+    test "get_issue_by_key!/1 raises when issue does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Jira.get_issue_by_key!("NONEXISTENT-123")
+      end
+    end
+
     test "create_issue/1 with valid data creates a issue" do
       valid_attrs = %{
         status: "some status",

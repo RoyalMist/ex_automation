@@ -78,6 +78,24 @@ defmodule ExAutomation.Gitlab do
   end
 
   @doc """
+  Gets a single release by name.
+
+  Raises `Ecto.NoResultsError` if the Release does not exist.
+
+  ## Examples
+
+      iex> get_release_by_name!("v1.0.0")
+      %Release{}
+
+      iex> get_release_by_name!("nonexistent-release")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_release_by_name!(name) do
+    Repo.get_by!(Release, name: name)
+  end
+
+  @doc """
   Creates a release.
 
   ## Examples

@@ -102,6 +102,24 @@ defmodule ExAutomation.Jira do
   end
 
   @doc """
+  Gets a single issue by key.
+
+  Raises `Ecto.NoResultsError` if the Issue does not exist.
+
+  ## Examples
+
+      iex> get_issue_by_key!("PROJ-123")
+      %Issue{}
+
+      iex> get_issue_by_key!("NONEXISTENT-456")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_issue_by_key!(key) do
+    Repo.get_by!(Issue, key: key)
+  end
+
+  @doc """
   Creates a issue.
 
   ## Examples
