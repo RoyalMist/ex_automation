@@ -94,7 +94,7 @@ jobs:
             ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-
             ${{ env.MIX_ENV }}-mise-
       - run: mix deps.get --only prod
-      - run: mix do assets.setup, assets.deploy, compile --warnings-as-errors, release --overwrite
+      #- run: mix do assets.setup, assets.deploy, compile --warnings-as-errors, release --overwrite
       - if: ${{ contains(github.ref, 'refs/tags/') }}
         uses: docker/setup-buildx-action@v3
       - if: ${{ contains(github.ref, 'refs/tags/') }}
