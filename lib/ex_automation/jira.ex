@@ -1,12 +1,10 @@
 defmodule ExAutomation.Jira do
   import Ecto.Query, warn: false
   alias ExAutomation.Repo
-
   alias ExAutomation.Jira.Issue
-  alias ExAutomation.Accounts.Scope
 
   @doc """
-  Subscribes to scoped notifications about any issue changes.
+  Subscribes to notifications about any issue changes.
 
   The broadcasted messages match the pattern:
 
@@ -15,16 +13,12 @@ defmodule ExAutomation.Jira do
     * {:deleted, %Issue{}}
 
   """
-  def subscribe_issues(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(ExAutomation.PubSub, "user:#{key}:issues")
+  def subscribe_issues() do
+    Phoenix.PubSub.subscribe(ExAutomation.PubSub, "issues")
   end
 
-  defp broadcast(%Scope{} = scope, message) do
-    key = scope.user.id
-
-    Phoenix.PubSub.broadcast(ExAutomation.PubSub, "user:#{key}:issues", message)
+  defp broadcast(message) do
+    Phoenix.PubSub.broadcast(ExAutomation.PubSub, "issues", message)
   end
 
   @moduledoc """
@@ -81,12 +75,12 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> list_issues(scope)
+      iex> list_issues()
       [%Issue{}, ...]
 
   """
-  def list_issues(%Scope{} = scope) do
-    Repo.all_by(Issue, user_id: scope.user.id)
+  def list_issues() do
+    Repo.all(Issue)
   end
 
   @doc """
@@ -96,15 +90,15 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> get_issue!(scope, 123)
+      iex> get_issue!(123)
       %Issue{}
 
-      iex> get_issue!(scope, 456)
+      iex> get_issue!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_issue!(%Scope{} = scope, id) do
-    Repo.get_by!(Issue, id: id, user_id: scope.user.id)
+  def get_issue!(id) do
+    Repo.get_by!(Issue, id: id)
   end
 
   @doc """
@@ -112,19 +106,19 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> create_issue(scope, %{field: value})
+      iex> create_issue(%{field: value})
       {:ok, %Issue{}}
 
-      iex> create_issue(scope, %{field: bad_value})
+      iex> create_issue(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_issue(%Scope{} = scope, attrs) do
+  def create_issue(attrs) do
     with {:ok, issue = %Issue{}} <-
            %Issue{}
-           |> Issue.changeset(attrs, scope)
+           |> Issue.changeset(attrs)
            |> Repo.insert() do
-      broadcast(scope, {:created, issue})
+      broadcast({:created, issue})
       {:ok, issue}
     end
   end
@@ -134,21 +128,19 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> update_issue(scope, issue, %{field: new_value})
+      iex> update_issue(issue, %{field: new_value})
       {:ok, %Issue{}}
 
-      iex> update_issue(scope, issue, %{field: bad_value})
+      iex> update_issue(issue, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_issue(%Scope{} = scope, %Issue{} = issue, attrs) do
-    true = issue.user_id == scope.user.id
-
+  def update_issue(%Issue{} = issue, attrs) do
     with {:ok, issue = %Issue{}} <-
            issue
-           |> Issue.changeset(attrs, scope)
+           |> Issue.changeset(attrs)
            |> Repo.update() do
-      broadcast(scope, {:updated, issue})
+      broadcast({:updated, issue})
       {:ok, issue}
     end
   end
@@ -158,19 +150,17 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> delete_issue(scope, issue)
+      iex> delete_issue(issue)
       {:ok, %Issue{}}
 
-      iex> delete_issue(scope, issue)
+      iex> delete_issue(issue)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_issue(%Scope{} = scope, %Issue{} = issue) do
-    true = issue.user_id == scope.user.id
-
+  def delete_issue(%Issue{} = issue) do
     with {:ok, issue = %Issue{}} <-
            Repo.delete(issue) do
-      broadcast(scope, {:deleted, issue})
+      broadcast({:deleted, issue})
       {:ok, issue}
     end
   end
@@ -180,13 +170,11 @@ defmodule ExAutomation.Jira do
 
   ## Examples
 
-      iex> change_issue(scope, issue)
+      iex> change_issue(issue)
       %Ecto.Changeset{data: %Issue{}}
 
   """
-  def change_issue(%Scope{} = scope, %Issue{} = issue, attrs \\ %{}) do
-    true = issue.user_id == scope.user.id
-
-    Issue.changeset(issue, attrs, scope)
+  def change_issue(%Issue{} = issue, attrs \\ %{}) do
+    Issue.changeset(issue, attrs)
   end
 end

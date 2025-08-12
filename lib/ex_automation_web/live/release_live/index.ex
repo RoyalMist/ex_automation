@@ -28,7 +28,6 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/releases/#{release}"}>Show</.link>
           </div>
-          <.link navigate={~p"/releases/#{release}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, release}}>
           <.link
@@ -46,19 +45,19 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Gitlab.subscribe_releases(socket.assigns.current_scope)
+      Gitlab.subscribe_releases()
     end
 
     {:ok,
      socket
      |> assign(:page_title, "Listing Releases")
-     |> stream(:releases, Gitlab.list_releases(socket.assigns.current_scope))}
+     |> stream(:releases, Gitlab.list_releases())}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    release = Gitlab.get_release!(socket.assigns.current_scope, id)
-    {:ok, _} = Gitlab.delete_release(socket.assigns.current_scope, release)
+    release = Gitlab.get_release!(id)
+    {:ok, _} = Gitlab.delete_release(release)
 
     {:noreply, stream_delete(socket, :releases, release)}
   end
@@ -66,7 +65,6 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
   @impl true
   def handle_info({type, %ExAutomation.Gitlab.Release{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply,
-     stream(socket, :releases, Gitlab.list_releases(socket.assigns.current_scope), reset: true)}
+    {:noreply, stream(socket, :releases, Gitlab.list_releases(), reset: true)}
   end
 end

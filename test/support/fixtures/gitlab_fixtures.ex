@@ -7,7 +7,7 @@ defmodule ExAutomation.GitlabFixtures do
   @doc """
   Generate a release.
   """
-  def release_fixture(scope, attrs \\ %{}) do
+  def release_fixture(attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
         date: ~N[2025-08-11 08:34:00],
@@ -15,7 +15,7 @@ defmodule ExAutomation.GitlabFixtures do
         name: "some name"
       })
 
-    {:ok, release} = ExAutomation.Gitlab.create_release(scope, attrs)
+    {:ok, release} = ExAutomation.Gitlab.create_release(attrs)
     release
   end
 end

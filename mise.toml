@@ -3,6 +3,9 @@ elixir = "1.18.4"
 erlang = "28.0.2"
 ruby = "3.4.5"
 
+[env]
+_.file = ".env"
+
 [tasks."dev:gettext"]
 description = "Update PO files"
 run = "mix gettext.extract --merge"

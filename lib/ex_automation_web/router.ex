@@ -42,13 +42,9 @@ defmodule ExAutomationWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/releases", ReleaseLive.Index, :index
-      live "/releases/new", ReleaseLive.Form, :new
       live "/releases/:id", ReleaseLive.Show, :show
-      live "/releases/:id/edit", ReleaseLive.Form, :edit
       live "/issues", IssueLive.Index, :index
-      live "/issues/new", IssueLive.Form, :new
       live "/issues/:id", IssueLive.Show, :show
-      live "/issues/:id/edit", IssueLive.Form, :edit
     end
 
     post "/users/update-password", UserSessionController, :update_password

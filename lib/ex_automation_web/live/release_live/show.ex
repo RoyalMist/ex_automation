@@ -14,9 +14,6 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
           <.button navigate={~p"/releases"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/releases/#{@release}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit release
-          </.button>
         </:actions>
       </.header>
 
@@ -32,13 +29,13 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     if connected?(socket) do
-      Gitlab.subscribe_releases(socket.assigns.current_scope)
+      Gitlab.subscribe_releases()
     end
 
     {:ok,
      socket
      |> assign(:page_title, "Show Release")
-     |> assign(:release, Gitlab.get_release!(socket.assigns.current_scope, id))}
+     |> assign(:release, Gitlab.get_release!(id))}
   end
 
   @impl true

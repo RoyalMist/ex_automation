@@ -14,9 +14,6 @@ defmodule ExAutomationWeb.IssueLive.Show do
           <.button navigate={~p"/issues"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/issues/#{@issue}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit issue
-          </.button>
         </:actions>
       </.header>
 
@@ -34,13 +31,13 @@ defmodule ExAutomationWeb.IssueLive.Show do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     if connected?(socket) do
-      Jira.subscribe_issues(socket.assigns.current_scope)
+      Jira.subscribe_issues()
     end
 
     {:ok,
      socket
      |> assign(:page_title, "Show Issue")
-     |> assign(:issue, Jira.get_issue!(socket.assigns.current_scope, id))}
+     |> assign(:issue, Jira.get_issue!(id))}
   end
 
   @impl true

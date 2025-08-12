@@ -7,7 +7,7 @@ defmodule ExAutomation.JiraFixtures do
   @doc """
   Generate a issue.
   """
-  def issue_fixture(scope, attrs \\ %{}) do
+  def issue_fixture(attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
         key: "some key",
@@ -17,7 +17,7 @@ defmodule ExAutomation.JiraFixtures do
         type: "some type"
       })
 
-    {:ok, issue} = ExAutomation.Jira.create_issue(scope, attrs)
+    {:ok, issue} = ExAutomation.Jira.create_issue(attrs)
     issue
   end
 end

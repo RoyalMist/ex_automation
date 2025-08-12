@@ -30,7 +30,6 @@ defmodule ExAutomationWeb.IssueLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/issues/#{issue}"}>Show</.link>
           </div>
-          <.link navigate={~p"/issues/#{issue}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, issue}}>
           <.link
@@ -48,19 +47,19 @@ defmodule ExAutomationWeb.IssueLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      Jira.subscribe_issues(socket.assigns.current_scope)
+      Jira.subscribe_issues()
     end
 
     {:ok,
      socket
      |> assign(:page_title, "Listing Issues")
-     |> stream(:issues, Jira.list_issues(socket.assigns.current_scope))}
+     |> stream(:issues, Jira.list_issues())}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    issue = Jira.get_issue!(socket.assigns.current_scope, id)
-    {:ok, _} = Jira.delete_issue(socket.assigns.current_scope, issue)
+    issue = Jira.get_issue!(id)
+    {:ok, _} = Jira.delete_issue(issue)
 
     {:noreply, stream_delete(socket, :issues, issue)}
   end
@@ -68,7 +67,6 @@ defmodule ExAutomationWeb.IssueLive.Index do
   @impl true
   def handle_info({type, %ExAutomation.Jira.Issue{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply,
-     stream(socket, :issues, Jira.list_issues(socket.assigns.current_scope), reset: true)}
+    {:noreply, stream(socket, :issues, Jira.list_issues(), reset: true)}
   end
 end

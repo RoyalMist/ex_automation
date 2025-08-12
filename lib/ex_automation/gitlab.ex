@@ -5,12 +5,10 @@ defmodule ExAutomation.Gitlab do
 
   import Ecto.Query, warn: false
   alias ExAutomation.Repo
-
   alias ExAutomation.Gitlab.Release
-  alias ExAutomation.Accounts.Scope
 
   @doc """
-  Subscribes to scoped notifications about any release changes.
+  Subscribes to notifications about any release changes.
 
   The broadcasted messages match the pattern:
 
@@ -19,16 +17,12 @@ defmodule ExAutomation.Gitlab do
     * {:deleted, %Release{}}
 
   """
-  def subscribe_releases(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(ExAutomation.PubSub, "user:#{key}:releases")
+  def subscribe_releases() do
+    Phoenix.PubSub.subscribe(ExAutomation.PubSub, "releases")
   end
 
-  defp broadcast(%Scope{} = scope, message) do
-    key = scope.user.id
-
-    Phoenix.PubSub.broadcast(ExAutomation.PubSub, "user:#{key}:releases", message)
+  defp broadcast(message) do
+    Phoenix.PubSub.broadcast(ExAutomation.PubSub, "releases", message)
   end
 
   @doc """
@@ -57,12 +51,12 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> list_releases(scope)
+      iex> list_releases()
       [%Release{}, ...]
 
   """
-  def list_releases(%Scope{} = scope) do
-    Repo.all_by(Release, user_id: scope.user.id)
+  def list_releases() do
+    Repo.all(Release)
   end
 
   @doc """
@@ -72,15 +66,15 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> get_release!(scope, 123)
+      iex> get_release!(123)
       %Release{}
 
-      iex> get_release!(scope, 456)
+      iex> get_release!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_release!(%Scope{} = scope, id) do
-    Repo.get_by!(Release, id: id, user_id: scope.user.id)
+  def get_release!(id) do
+    Repo.get_by!(Release, id: id)
   end
 
   @doc """
@@ -88,19 +82,19 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> create_release(scope, %{field: value})
+      iex> create_release(%{field: value})
       {:ok, %Release{}}
 
-      iex> create_release(scope, %{field: bad_value})
+      iex> create_release(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_release(%Scope{} = scope, attrs) do
+  def create_release(attrs) do
     with {:ok, release = %Release{}} <-
            %Release{}
-           |> Release.changeset(attrs, scope)
+           |> Release.changeset(attrs)
            |> Repo.insert() do
-      broadcast(scope, {:created, release})
+      broadcast({:created, release})
       {:ok, release}
     end
   end
@@ -110,21 +104,19 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> update_release(scope, release, %{field: new_value})
+      iex> update_release(release, %{field: new_value})
       {:ok, %Release{}}
 
-      iex> update_release(scope, release, %{field: bad_value})
+      iex> update_release(release, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_release(%Scope{} = scope, %Release{} = release, attrs) do
-    true = release.user_id == scope.user.id
-
+  def update_release(%Release{} = release, attrs) do
     with {:ok, release = %Release{}} <-
            release
-           |> Release.changeset(attrs, scope)
+           |> Release.changeset(attrs)
            |> Repo.update() do
-      broadcast(scope, {:updated, release})
+      broadcast({:updated, release})
       {:ok, release}
     end
   end
@@ -134,19 +126,17 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> delete_release(scope, release)
+      iex> delete_release(release)
       {:ok, %Release{}}
 
-      iex> delete_release(scope, release)
+      iex> delete_release(release)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_release(%Scope{} = scope, %Release{} = release) do
-    true = release.user_id == scope.user.id
-
+  def delete_release(%Release{} = release) do
     with {:ok, release = %Release{}} <-
            Repo.delete(release) do
-      broadcast(scope, {:deleted, release})
+      broadcast({:deleted, release})
       {:ok, release}
     end
   end
@@ -156,13 +146,11 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> change_release(scope, release)
+      iex> change_release(release)
       %Ecto.Changeset{data: %Release{}}
 
   """
-  def change_release(%Scope{} = scope, %Release{} = release, attrs \\ %{}) do
-    true = release.user_id == scope.user.id
-
-    Release.changeset(release, attrs, scope)
+  def change_release(%Release{} = release, attrs \\ %{}) do
+    Release.changeset(release, attrs)
   end
 end
