@@ -7,7 +7,7 @@ defmodule ExAutomation.GitlabTest do
 
     import ExAutomation.GitlabFixtures
 
-    @invalid_attrs %{name: nil, date: nil, description: nil, tags: nil}
+    @invalid_attrs %{name: nil, date: nil, description: nil}
 
     test "list_releases/0 returns all releases" do
       release = release_fixture()
@@ -37,15 +37,14 @@ defmodule ExAutomation.GitlabTest do
       valid_attrs = %{
         name: "some name",
         date: ~N[2025-08-11 08:34:00],
-        description: "some description",
-        tags: ["v1.0", "stable", "production"]
+        description: "some description"
       }
 
       assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
       assert release.name == "some name"
       assert release.date == ~N[2025-08-11 08:34:00]
       assert release.description == "some description"
-      assert release.tags == ["v1.0", "stable", "production"]
+      assert release.tags == []
     end
 
     test "create_release/1 with invalid data returns error changeset" do
@@ -92,8 +91,7 @@ defmodule ExAutomation.GitlabTest do
       duplicate_attrs = %{
         name: release.name,
         date: ~N[2025-08-12 08:34:00],
-        description: "another description",
-        tags: ["duplicate"]
+        description: "another description"
       }
 
       assert {:error, %Ecto.Changeset{} = changeset} = Gitlab.create_release(duplicate_attrs)
@@ -147,8 +145,7 @@ defmodule ExAutomation.GitlabTest do
       valid_attrs = %{
         name: "broadcast test release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description",
-        tags: ["broadcast"]
+        description: "test description"
       }
 
       {:ok, release} = Gitlab.create_release(valid_attrs)
@@ -175,48 +172,11 @@ defmodule ExAutomation.GitlabTest do
       assert_receive {:deleted, ^deleted_release}
     end
 
-    test "changeset validation requires name" do
-      attrs = %{date: ~N[2025-08-11 08:34:00], description: "some description"}
-      changeset = Release.changeset(%Release{}, attrs)
-
-      refute changeset.valid?
-      assert "can't be blank" in errors_on(changeset).name
-    end
-
-    test "changeset validation requires date" do
-      attrs = %{name: "some name", description: "some description"}
-      changeset = Release.changeset(%Release{}, attrs)
-
-      refute changeset.valid?
-      assert "can't be blank" in errors_on(changeset).date
-    end
-
-    test "changeset validation requires description" do
-      attrs = %{name: "some name", date: ~N[2025-08-11 08:34:00]}
-      changeset = Release.changeset(%Release{}, attrs)
-
-      refute changeset.valid?
-      assert "can't be blank" in errors_on(changeset).description
-    end
-
-    test "changeset is valid with all required fields" do
-      attrs = %{
-        name: "valid release",
-        date: ~N[2025-08-11 08:34:00],
-        description: "valid description"
-      }
-
-      changeset = Release.changeset(%Release{}, attrs)
-
-      assert changeset.valid?
-    end
-
     test "timestamps are set correctly on creation" do
       valid_attrs = %{
         name: "timestamp test release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description",
-        tags: ["timestamp"]
+        description: "test description"
       }
 
       {:ok, release} = Gitlab.create_release(valid_attrs)
@@ -226,23 +186,23 @@ defmodule ExAutomation.GitlabTest do
       assert release.inserted_at == release.updated_at
     end
 
-    test "create_release/1 with empty tags creates release with empty array" do
+    test "create_release/1 without tags field defaults to empty array" do
       valid_attrs = %{
-        name: "empty tags release",
+        name: "no tags release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description",
-        tags: []
+        description: "test description"
       }
 
       assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
       assert release.tags == []
     end
 
-    test "create_release/1 without tags field defaults to empty array" do
+    test "create_release/1 ignores tags field" do
       valid_attrs = %{
-        name: "no tags release",
+        name: "tags ignored release",
         date: ~N[2025-08-11 08:34:00],
-        description: "test description"
+        description: "test description",
+        tags: ["should", "be", "ignored"]
       }
 
       assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
@@ -265,7 +225,7 @@ defmodule ExAutomation.GitlabTest do
       assert updated_release.tags == []
     end
 
-    test "changeset accepts valid tags array" do
+    test "update_changeset accepts valid tags array" do
       attrs = %{
         name: "valid release",
         date: ~N[2025-08-11 08:34:00],
@@ -273,13 +233,13 @@ defmodule ExAutomation.GitlabTest do
         tags: ["tag1", "tag2", "tag3"]
       }
 
-      changeset = Release.changeset(%Release{}, attrs)
+      changeset = Release.update_changeset(%Release{}, attrs)
 
       assert changeset.valid?
       assert changeset.changes.tags == ["tag1", "tag2", "tag3"]
     end
 
-    test "changeset accepts empty tags array" do
+    test "update_changeset accepts empty tags array" do
       attrs = %{
         name: "valid release",
         date: ~N[2025-08-11 08:34:00],
@@ -287,7 +247,7 @@ defmodule ExAutomation.GitlabTest do
         tags: []
       }
 
-      changeset = Release.changeset(%Release{}, attrs)
+      changeset = Release.update_changeset(%Release{}, attrs)
 
       assert changeset.valid?
       # Empty array is not considered a change if the default is also empty
@@ -295,7 +255,7 @@ defmodule ExAutomation.GitlabTest do
       assert Map.get(changeset.changes, :tags, []) == []
     end
 
-    test "changeset handles nil tags gracefully" do
+    test "update_changeset handles nil tags gracefully" do
       attrs = %{
         name: "valid release",
         date: ~N[2025-08-11 08:34:00],
@@ -303,14 +263,14 @@ defmodule ExAutomation.GitlabTest do
         tags: nil
       }
 
-      changeset = Release.changeset(%Release{}, attrs)
+      changeset = Release.update_changeset(%Release{}, attrs)
 
       assert changeset.valid?
       # nil tags should be cast and will appear in changes
       assert changeset.changes.tags == nil
     end
 
-    test "changeset validates tags as list of strings" do
+    test "update_changeset validates tags as list of strings" do
       attrs = %{
         name: "valid release",
         date: ~N[2025-08-11 08:34:00],
@@ -318,39 +278,30 @@ defmodule ExAutomation.GitlabTest do
         tags: ["string1", "string2", "string3"]
       }
 
-      changeset = Release.changeset(%Release{}, attrs)
+      changeset = Release.update_changeset(%Release{}, attrs)
 
       assert changeset.valid?
       assert changeset.changes.tags == ["string1", "string2", "string3"]
     end
 
-    test "create_release/1 handles duplicate tags" do
-      valid_attrs = %{
-        name: "duplicate tags release",
-        date: ~N[2025-08-11 08:34:00],
-        description: "test description",
-        tags: ["tag1", "tag1", "tag2", "tag2"]
-      }
+    test "update_release/2 handles duplicate tags" do
+      release = release_fixture()
+      update_attrs = %{tags: ["tag1", "tag1", "tag2", "tag2"]}
 
-      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
+      assert {:ok, %Release{} = updated_release} = Gitlab.update_release(release, update_attrs)
       # Should preserve duplicates as provided
-      assert release.tags == ["tag1", "tag1", "tag2", "tag2"]
+      assert updated_release.tags == ["tag1", "tag1", "tag2", "tag2"]
     end
 
-    test "create_release/1 handles very long tags array" do
+    test "update_release/2 handles very long tags array" do
+      release = release_fixture()
       long_tags = Enum.map(1..100, fn i -> "tag#{i}" end)
+      update_attrs = %{tags: long_tags}
 
-      valid_attrs = %{
-        name: "long tags release",
-        date: ~N[2025-08-11 08:34:00],
-        description: "test description",
-        tags: long_tags
-      }
-
-      assert {:ok, %Release{} = release} = Gitlab.create_release(valid_attrs)
-      assert length(release.tags) == 100
-      assert "tag1" in release.tags
-      assert "tag100" in release.tags
+      assert {:ok, %Release{} = updated_release} = Gitlab.update_release(release, update_attrs)
+      assert length(updated_release.tags) == 100
+      assert "tag1" in updated_release.tags
+      assert "tag100" in updated_release.tags
     end
 
     test "update_release/2 preserves other fields when updating tags" do
@@ -368,6 +319,106 @@ defmodule ExAutomation.GitlabTest do
       assert updated_release.name == "original name"
       assert updated_release.description == "original description"
       assert updated_release.date == release.date
+    end
+
+    test "changeset/2 for creation does not cast tags field" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: ["should", "be", "ignored"]
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      refute Map.has_key?(changeset.changes, :tags)
+    end
+
+    test "update_changeset/2 for updates casts tags field" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description",
+        tags: ["tag1", "tag2"]
+      }
+
+      changeset = Release.update_changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+      assert changeset.changes.tags == ["tag1", "tag2"]
+    end
+
+    test "changeset/2 validation requires name" do
+      attrs = %{date: ~N[2025-08-11 08:34:00], description: "some description"}
+      changeset = Release.changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).name
+    end
+
+    test "changeset/2 validation requires date" do
+      attrs = %{name: "some name", description: "some description"}
+      changeset = Release.changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).date
+    end
+
+    test "changeset/2 validation requires description" do
+      attrs = %{name: "some name", date: ~N[2025-08-11 08:34:00]}
+      changeset = Release.changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).description
+    end
+
+    test "changeset/2 is valid with all required fields" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description"
+      }
+
+      changeset = Release.changeset(%Release{}, attrs)
+
+      assert changeset.valid?
+    end
+
+    test "update_changeset/2 validation requires name" do
+      attrs = %{date: ~N[2025-08-11 08:34:00], description: "some description"}
+      changeset = Release.update_changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).name
+    end
+
+    test "update_changeset/2 validation requires date" do
+      attrs = %{name: "some name", description: "some description"}
+      changeset = Release.update_changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).date
+    end
+
+    test "update_changeset/2 validation requires description" do
+      attrs = %{name: "some name", date: ~N[2025-08-11 08:34:00]}
+      changeset = Release.update_changeset(%Release{}, attrs)
+
+      refute changeset.valid?
+      assert "can't be blank" in errors_on(changeset).description
+    end
+
+    test "update_changeset/2 is valid with all required fields" do
+      attrs = %{
+        name: "valid release",
+        date: ~N[2025-08-11 08:34:00],
+        description: "valid description"
+      }
+
+      changeset = Release.update_changeset(%Release{}, attrs)
+
+      assert changeset.valid?
     end
   end
 end

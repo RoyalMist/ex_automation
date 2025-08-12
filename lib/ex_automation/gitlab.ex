@@ -98,10 +98,13 @@ defmodule ExAutomation.Gitlab do
   @doc """
   Creates a release.
 
+  Note: Tags are not allowed during creation and will be ignored if provided.
+  Use `update_release/2` to add tags after creation.
+
   ## Examples
 
-      iex> create_release(%{field: value})
-      {:ok, %Release{}}
+      iex> create_release(%{name: "v1.0", date: ~N[2025-01-01 00:00:00], description: "Release"})
+      {:ok, %Release{tags: []}}
 
       iex> create_release(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
@@ -120,10 +123,15 @@ defmodule ExAutomation.Gitlab do
   @doc """
   Updates a release.
 
+  This function allows updating all fields including tags.
+
   ## Examples
 
-      iex> update_release(release, %{field: new_value})
+      iex> update_release(release, %{name: "new name"})
       {:ok, %Release{}}
+
+      iex> update_release(release, %{tags: ["v1.0", "stable"]})
+      {:ok, %Release{tags: ["v1.0", "stable"]}}
 
       iex> update_release(release, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
@@ -132,7 +140,7 @@ defmodule ExAutomation.Gitlab do
   def update_release(%Release{} = release, attrs) do
     with {:ok, release = %Release{}} <-
            release
-           |> Release.changeset(attrs)
+           |> Release.update_changeset(attrs)
            |> Repo.update() do
       broadcast({:updated, release})
       {:ok, release}
@@ -162,13 +170,18 @@ defmodule ExAutomation.Gitlab do
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking release changes.
 
+  Uses the update changeset which allows modification of all fields including tags.
+
   ## Examples
 
       iex> change_release(release)
       %Ecto.Changeset{data: %Release{}}
 
+      iex> change_release(release, %{tags: ["new", "tags"]})
+      %Ecto.Changeset{changes: %{tags: ["new", "tags"]}}
+
   """
   def change_release(%Release{} = release, attrs \\ %{}) do
-    Release.changeset(release, attrs)
+    Release.update_changeset(release, attrs)
   end
 end

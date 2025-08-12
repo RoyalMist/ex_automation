@@ -14,8 +14,7 @@ defmodule ExAutomation.GitlabFixtures do
       Enum.into(attrs, %{
         date: ~N[2025-08-11 08:34:00],
         description: "some description",
-        name: "some name #{unique_id}",
-        tags: ["tag1", "tag2"]
+        name: "some name #{unique_id}"
       })
 
     {:ok, release} = ExAutomation.Gitlab.create_release(attrs)
