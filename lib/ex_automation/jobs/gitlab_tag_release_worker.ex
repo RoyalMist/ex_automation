@@ -11,5 +11,9 @@ defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
       |> Enum.map(&hd/1)
 
     Gitlab.update_release(release, %{tags: tags})
+
+    for tag <- tags do
+      ExAutomation.Jobs.JiraFetchIssueWorker.find_ticket(tag)
+    end
   end
 end
