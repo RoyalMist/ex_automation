@@ -64,21 +64,22 @@ defmodule ExAutomation.GitlabClient do
 
     Logger.debug("GitLab API request: GET #{url}")
 
-    with {:ok, response} <- Req.get(url, headers: headers, params: query_params) do
-      case response.status do
-        200 ->
-          {:ok, response.body}
+    case Req.get(url, headers: headers, params: query_params) do
+      {:ok, response} ->
+        case response.status do
+          200 ->
+            {:ok, response.body}
 
-        status when status in [401, 403] ->
-          {:error, %{status: status, body: response.body, message: "Authentication failed"}}
+          status when status in [401, 403] ->
+            {:error, %{status: status, body: response.body, message: "Authentication failed"}}
 
-        404 ->
-          {:error, %{status: 404, body: response.body, message: "Project not found"}}
+          404 ->
+            {:error, %{status: 404, body: response.body, message: "Project not found"}}
 
-        status when status >= 400 ->
-          {:error, %{status: status, body: response.body, message: "API request failed"}}
-      end
-    else
+          status when status >= 400 ->
+            {:error, %{status: status, body: response.body, message: "API request failed"}}
+        end
+
       {:error, exception} ->
         Logger.error("GitLab API request failed: #{inspect(exception)}")
         {:error, %{message: "Network error", details: inspect(exception)}}
