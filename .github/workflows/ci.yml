@@ -1,0 +1,117 @@
+name: CI
+on:
+  push:
+    branches: [main]
+    tags:
+      - "*"
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+env:
+  SHELL: /bin/bash
+jobs:
+  tools:
+    name: TOOLS
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+  lint:
+    name: LINT
+    needs: [tools]
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-
+            ${{ env.MIX_ENV }}-mise-
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix format --dry-run --check-formatted
+      - run: mix deps.unlock --check-unused
+      - run: mix hex.audit
+      - run: mix deps.audit
+      - run: mix credo
+      - run: mix sobelow --config
+  test:
+    name: TEST
+    needs: [tools]
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: test
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-
+            ${{ env.MIX_ENV }}-mise-
+      - run: mix deps.get
+      - run: mix test --max-failures=1 --color
+  build:
+    name: BUILD
+    needs: [lint, test]
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-
+            ${{ env.MIX_ENV }}-mise-
+      - run: mix deps.get --only prod
+      - run: mix do assets.setup, assets.deploy, compile --warnings-as-errors, release --overwrite
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        uses: docker/setup-buildx-action@v3
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        uses: 1password/load-secrets-action/configure@v2
+        with:
+          service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          SSH_KEY: "op://PrisM/Estimeight SSH Key/private key?ssh-format=openssh"
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ env.SSH_KEY }}
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        run: bundle install
+      - if: ${{ contains(github.ref, 'refs/tags/') }}
+        run: bundle exec kamal setup
