@@ -25,7 +25,7 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
       if initiative.key != issue.key do
         {initiative.key, initiative.summary}
       else
-        {issue.key, issue.summary}
+        {"", ""}
       end
 
     Reporting.create_entry(scope, %{

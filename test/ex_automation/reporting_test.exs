@@ -296,9 +296,9 @@ defmodule ExAutomation.ReportingTest do
       assert standalone_entry.issue_summary == standalone_issue.summary
       assert standalone_entry.issue_type == standalone_issue.type
       assert standalone_entry.issue_status == standalone_issue.status
-      # Initiative should be same as issue since no parent
-      assert standalone_entry.initiative_key == standalone_issue.key
-      assert standalone_entry.initiative_summary == standalone_issue.summary
+      # Initiative should be nil since it's the same as the issue
+      assert standalone_entry.initiative_key == nil
+      assert standalone_entry.initiative_summary == nil
 
       # Verify child issue entry (has parent, so initiative should be parent)
       child_entry = Enum.find(v200_entries, &(&1.issue_key == child_issue.key))
@@ -399,9 +399,9 @@ defmodule ExAutomation.ReportingTest do
       assert enriched_entry.issue_summary == issue.summary
       assert enriched_entry.issue_type == issue.type
       assert enriched_entry.issue_status == issue.status
-      # Since no parent, initiative should be same as issue
-      assert enriched_entry.initiative_key == issue.key
-      assert enriched_entry.initiative_summary == issue.summary
+      # Since no parent, initiative should be nil
+      assert enriched_entry.initiative_key == nil
+      assert enriched_entry.initiative_summary == nil
     end
 
     test "create_report/2 with invalid data returns error changeset" do
