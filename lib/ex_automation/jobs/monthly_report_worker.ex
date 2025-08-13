@@ -43,6 +43,7 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
 
     for release <- releases do
       Reporting.create_entry(scope, %{
+        report_id: report_id,
         release_name: release.name,
         release_date: release.date
       })
