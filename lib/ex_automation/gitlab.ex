@@ -60,6 +60,29 @@ defmodule ExAutomation.Gitlab do
   end
 
   @doc """
+  Returns the list of releases from a given year.
+
+  ## Examples
+
+      iex> list_releases_by_year(2024)
+      [%Release{}, ...]
+
+      iex> list_releases_by_year(2023)
+      []
+
+  """
+  def list_releases_by_year(year) when is_integer(year) do
+    start_date = NaiveDateTime.new!(year, 1, 1, 0, 0, 0)
+    end_date = NaiveDateTime.new!(year, 12, 31, 23, 59, 59)
+
+    from(r in Release,
+      where: r.date >= ^start_date and r.date <= ^end_date,
+      order_by: [desc: r.date]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single release.
 
   Raises `Ecto.NoResultsError` if the Release does not exist.

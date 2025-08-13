@@ -420,5 +420,56 @@ defmodule ExAutomation.GitlabTest do
 
       assert changeset.valid?
     end
+
+    test "list_releases_by_year/1 returns releases from specific year" do
+      # Create releases from different years
+      release_2023 =
+        release_fixture(%{
+          name: "release 2023",
+          date: ~N[2023-06-15 12:00:00],
+          description: "Release from 2023"
+        })
+
+      release_2024_jan =
+        release_fixture(%{
+          name: "release 2024 jan",
+          date: ~N[2024-01-01 00:00:00],
+          description: "Release from January 2024"
+        })
+
+      release_2024_dec =
+        release_fixture(%{
+          name: "release 2024 dec",
+          date: ~N[2024-12-31 23:59:59],
+          description: "Release from December 2024"
+        })
+
+      release_2025 =
+        release_fixture(%{
+          name: "release 2025",
+          date: ~N[2025-03-10 15:30:00],
+          description: "Release from 2025"
+        })
+
+      # Test 2024 releases
+      releases_2024 = Gitlab.list_releases_by_year(2024)
+      assert length(releases_2024) == 2
+      assert release_2024_dec in releases_2024
+      assert release_2024_jan in releases_2024
+      refute release_2023 in releases_2024
+      refute release_2025 in releases_2024
+
+      # Verify ordering (desc by date)
+      assert releases_2024 == [release_2024_dec, release_2024_jan]
+
+      # Test 2023 releases
+      releases_2023 = Gitlab.list_releases_by_year(2023)
+      assert length(releases_2023) == 1
+      assert release_2023 in releases_2023
+
+      # Test year with no releases
+      releases_2022 = Gitlab.list_releases_by_year(2022)
+      assert releases_2022 == []
+    end
   end
 end

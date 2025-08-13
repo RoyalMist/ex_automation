@@ -10,14 +10,24 @@ defmodule ExAutomation.GitlabFixtures do
   def release_fixture(attrs \\ %{}) do
     unique_id = System.unique_integer([:positive])
 
-    attrs =
-      Enum.into(attrs, %{
+    # Extract tags from attrs since they can't be set during creation
+    {tags, create_attrs} = Map.pop(attrs, :tags)
+
+    create_attrs =
+      Enum.into(create_attrs, %{
         date: ~N[2025-08-11 08:34:00],
         description: "some description",
         name: "some name #{unique_id}"
       })
 
-    {:ok, release} = ExAutomation.Gitlab.create_release(attrs)
-    release
+    {:ok, release} = ExAutomation.Gitlab.create_release(create_attrs)
+
+    # Update with tags if provided
+    with tags when not is_nil(tags) <- tags do
+      {:ok, release} = ExAutomation.Gitlab.update_release(release, %{tags: tags})
+      release
+    else
+      _ -> release
+    end
   end
 end
