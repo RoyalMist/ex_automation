@@ -80,10 +80,11 @@ defmodule ExAutomation.Reporting do
            |> Repo.insert() do
       broadcast(scope, {:created, report})
 
-      # Enqueue the monthly report worker job
-      %{user_id: scope.user.id, report_id: report.id}
-      |> ExAutomation.Jobs.MonthlyReportWorker.new()
-      |> Oban.insert()
+      Task.start(fn ->
+        %{user_id: scope.user.id, report_id: report.id}
+        |> ExAutomation.Jobs.MonthlyReportWorker.new()
+        |> Oban.insert()
+      end)
 
       {:ok, report}
     end
