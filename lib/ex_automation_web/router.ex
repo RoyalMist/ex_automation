@@ -50,7 +50,6 @@ defmodule ExAutomationWeb.Router do
       live "/reports/:id", ReportLive.Show, :show
 
       live "/entries", EntryLive.Index, :index
-      live "/entries/new", EntryLive.Form, :new
       live "/entries/:id", EntryLive.Show, :show
     end
 

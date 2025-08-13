@@ -160,7 +160,10 @@ defmodule ExAutomation.Reporting do
   end
 
   @doc """
-  Creates a entry.
+  Creates an entry (internal API used by MonthlyReportWorker).
+
+  This function is not intended for manual entry creation via UI.
+  Entries are automatically created when reports are processed by background jobs.
 
   ## Examples
 

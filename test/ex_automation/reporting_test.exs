@@ -1,6 +1,5 @@
 defmodule ExAutomation.ReportingTest do
   use ExAutomation.DataCase
-  import Ecto.Query
 
   alias ExAutomation.Reporting
 
@@ -129,47 +128,64 @@ defmodule ExAutomation.ReportingTest do
     import ExAutomation.AccountsFixtures, only: [user_scope_fixture: 0]
     import ExAutomation.ReportingFixtures
 
-    @invalid_attrs %{release_name: nil, release_date: nil}
+    @invalid_attrs %{report_id: nil, release_name: nil, release_date: nil}
 
     test "list_entries/1 returns all scoped entries" do
       scope = user_scope_fixture()
       other_scope = user_scope_fixture()
-      entry = entry_fixture(scope)
-      other_entry = entry_fixture(other_scope)
+      report = report_fixture(scope)
+      other_report = report_fixture(other_scope)
+      entry = entry_fixture(scope, %{report_id: report.id})
+      other_entry = entry_fixture(other_scope, %{report_id: other_report.id})
       assert Reporting.list_entries(scope) == [entry]
       assert Reporting.list_entries(other_scope) == [other_entry]
     end
 
     test "get_entry!/2 returns the entry with given id" do
       scope = user_scope_fixture()
-      entry = entry_fixture(scope)
+      report = report_fixture(scope)
+      entry = entry_fixture(scope, %{report_id: report.id})
       other_scope = user_scope_fixture()
       assert Reporting.get_entry!(scope, entry.id) == entry
       assert_raise Ecto.NoResultsError, fn -> Reporting.get_entry!(other_scope, entry.id) end
     end
 
-    test "create_entry/2 with valid data creates a entry" do
-      valid_attrs = %{release_name: "some release_name", release_date: ~N[2025-08-12 12:26:00]}
+    test "create_entry/2 with valid data creates a entry (internal API for MonthlyReportWorker)" do
       scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      valid_attrs = %{
+        report_id: report.id,
+        release_name: "some release_name",
+        release_date: ~N[2025-08-12 12:26:00]
+      }
 
       assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
       assert entry.release_name == "some release_name"
       assert entry.release_date == ~N[2025-08-12 12:26:00]
+      assert entry.report_id == report.id
       assert entry.user_id == scope.user.id
     end
 
-    test "create_entry/2 with invalid data returns error changeset" do
+    test "create_entry/2 with invalid data returns error changeset (internal API)" do
       scope = user_scope_fixture()
       assert {:error, %Ecto.Changeset{}} = Reporting.create_entry(scope, @invalid_attrs)
     end
 
-    test "create_entry/2 with only required fields creates a entry" do
-      valid_attrs = %{release_name: "minimal release", release_date: ~N[2025-01-01 12:00:00]}
+    test "create_entry/2 with only required fields creates a entry (internal API)" do
       scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      valid_attrs = %{
+        report_id: report.id,
+        release_name: "minimal release",
+        release_date: ~N[2025-01-01 12:00:00]
+      }
 
       assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
       assert entry.release_name == "minimal release"
       assert entry.release_date == ~N[2025-01-01 12:00:00]
+      assert entry.report_id == report.id
       assert entry.issue_key == nil
       assert entry.issue_summary == nil
       assert entry.issue_type == nil
@@ -179,8 +195,12 @@ defmodule ExAutomation.ReportingTest do
       assert entry.user_id == scope.user.id
     end
 
-    test "create_entry/2 with optional fields creates a entry" do
+    test "create_entry/2 with optional fields creates a entry (internal API)" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
       valid_attrs = %{
+        report_id: report.id,
         release_name: "full release",
         release_date: ~N[2025-01-01 12:00:00],
         issue_key: "TEST-123",
@@ -191,11 +211,10 @@ defmodule ExAutomation.ReportingTest do
         initiative_summary: "Test initiative"
       }
 
-      scope = user_scope_fixture()
-
       assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
       assert entry.release_name == "full release"
       assert entry.release_date == ~N[2025-01-01 12:00:00]
+      assert entry.report_id == report.id
       assert entry.issue_key == "TEST-123"
       assert entry.issue_summary == "Test issue summary"
       assert entry.issue_type == "Bug"
@@ -210,21 +229,8 @@ defmodule ExAutomation.ReportingTest do
       report = report_fixture(scope)
 
       # Create entries associated with the report
-      entry1 = entry_fixture(scope, %{release_name: "Entry 1"})
-      entry2 = entry_fixture(scope, %{release_name: "Entry 2"})
-
-      # Update entries to be associated with the report
-      {1, _} =
-        ExAutomation.Repo.update_all(
-          from(e in Entry, where: e.id == ^entry1.id),
-          set: [report_id: report.id]
-        )
-
-      {1, _} =
-        ExAutomation.Repo.update_all(
-          from(e in Entry, where: e.id == ^entry2.id),
-          set: [report_id: report.id]
-        )
+      entry1 = entry_fixture(scope, %{release_name: "Entry 1", report_id: report.id})
+      entry2 = entry_fixture(scope, %{release_name: "Entry 2", report_id: report.id})
 
       # Verify entries exist and are associated with the report
       assert ExAutomation.Repo.get!(Entry, entry1.id).report_id == report.id

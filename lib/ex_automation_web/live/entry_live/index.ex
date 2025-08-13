@@ -9,11 +9,6 @@ defmodule ExAutomationWeb.EntryLive.Index do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Listing Entries
-        <:actions>
-          <.button variant="primary" navigate={~p"/entries/new"}>
-            <.icon name="hero-plus" /> New Entry
-          </.button>
-        </:actions>
       </.header>
 
       <.table

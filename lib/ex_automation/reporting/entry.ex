@@ -21,6 +21,7 @@ defmodule ExAutomation.Reporting.Entry do
   def changeset(entry, attrs, user_scope) do
     entry
     |> cast(attrs, [
+      :report_id,
       :release_name,
       :release_date,
       :issue_key,
@@ -31,6 +32,7 @@ defmodule ExAutomation.Reporting.Entry do
       :initiative_summary
     ])
     |> validate_required([
+      :report_id,
       :release_name,
       :release_date
     ])
