@@ -97,7 +97,7 @@ defmodule ExAutomation.ReportingTest do
     import ExAutomation.AccountsFixtures, only: [user_scope_fixture: 0]
     import ExAutomation.ReportingFixtures
 
-    @invalid_attrs %{release_name: nil, release_date: nil, issue_key: nil, issue_summary: nil, issue_type: nil, issue_status: nil, initiative_key: nil, initiative_summary: nil}
+    @invalid_attrs %{release_name: nil, release_date: nil}
 
     test "list_entries/1 returns all scoped entries" do
       scope = user_scope_fixture()
@@ -117,18 +117,12 @@ defmodule ExAutomation.ReportingTest do
     end
 
     test "create_entry/2 with valid data creates a entry" do
-      valid_attrs = %{release_name: "some release_name", release_date: ~N[2025-08-12 12:26:00], issue_key: "some issue_key", issue_summary: "some issue_summary", issue_type: "some issue_type", issue_status: "some issue_status", initiative_key: "some initiative_key", initiative_summary: "some initiative_summary"}
+      valid_attrs = %{release_name: "some release_name", release_date: ~N[2025-08-12 12:26:00]}
       scope = user_scope_fixture()
 
       assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
       assert entry.release_name == "some release_name"
       assert entry.release_date == ~N[2025-08-12 12:26:00]
-      assert entry.issue_key == "some issue_key"
-      assert entry.issue_summary == "some issue_summary"
-      assert entry.issue_type == "some issue_type"
-      assert entry.issue_status == "some issue_status"
-      assert entry.initiative_key == "some initiative_key"
-      assert entry.initiative_summary == "some initiative_summary"
       assert entry.user_id == scope.user.id
     end
 
@@ -140,7 +134,17 @@ defmodule ExAutomation.ReportingTest do
     test "update_entry/3 with valid data updates the entry" do
       scope = user_scope_fixture()
       entry = entry_fixture(scope)
-      update_attrs = %{release_name: "some updated release_name", release_date: ~N[2025-08-13 12:26:00], issue_key: "some updated issue_key", issue_summary: "some updated issue_summary", issue_type: "some updated issue_type", issue_status: "some updated issue_status", initiative_key: "some updated initiative_key", initiative_summary: "some updated initiative_summary"}
+
+      update_attrs = %{
+        release_name: "some updated release_name",
+        release_date: ~N[2025-08-13 12:26:00],
+        issue_key: "some updated issue_key",
+        issue_summary: "some updated issue_summary",
+        issue_type: "some updated issue_type",
+        issue_status: "some updated issue_status",
+        initiative_key: "some updated initiative_key",
+        initiative_summary: "some updated initiative_summary"
+      }
 
       assert {:ok, %Entry{} = entry} = Reporting.update_entry(scope, entry, update_attrs)
       assert entry.release_name == "some updated release_name"
@@ -188,6 +192,70 @@ defmodule ExAutomation.ReportingTest do
       scope = user_scope_fixture()
       entry = entry_fixture(scope)
       assert %Ecto.Changeset{} = Reporting.change_entry(scope, entry)
+    end
+
+    test "create_entry/2 with only required fields creates a entry" do
+      valid_attrs = %{release_name: "minimal release", release_date: ~N[2025-01-01 12:00:00]}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
+      assert entry.release_name == "minimal release"
+      assert entry.release_date == ~N[2025-01-01 12:00:00]
+      assert entry.issue_key == nil
+      assert entry.issue_summary == nil
+      assert entry.issue_type == nil
+      assert entry.issue_status == nil
+      assert entry.initiative_key == nil
+      assert entry.initiative_summary == nil
+      assert entry.user_id == scope.user.id
+    end
+
+    test "create_entry/2 with optional fields creates a entry" do
+      valid_attrs = %{
+        release_name: "full release",
+        release_date: ~N[2025-01-01 12:00:00],
+        issue_key: "TEST-123",
+        issue_summary: "Test issue summary",
+        issue_type: "Bug",
+        issue_status: "Done",
+        initiative_key: "INIT-456",
+        initiative_summary: "Test initiative"
+      }
+
+      scope = user_scope_fixture()
+
+      assert {:ok, %Entry{} = entry} = Reporting.create_entry(scope, valid_attrs)
+      assert entry.release_name == "full release"
+      assert entry.release_date == ~N[2025-01-01 12:00:00]
+      assert entry.issue_key == "TEST-123"
+      assert entry.issue_summary == "Test issue summary"
+      assert entry.issue_type == "Bug"
+      assert entry.issue_status == "Done"
+      assert entry.initiative_key == "INIT-456"
+      assert entry.initiative_summary == "Test initiative"
+      assert entry.user_id == scope.user.id
+    end
+
+    test "update_entry/3 can clear optional fields" do
+      scope = user_scope_fixture()
+      entry = entry_fixture(scope)
+
+      update_attrs = %{
+        issue_key: nil,
+        issue_summary: nil,
+        issue_type: nil,
+        issue_status: nil,
+        initiative_key: nil,
+        initiative_summary: nil
+      }
+
+      assert {:ok, %Entry{} = entry} = Reporting.update_entry(scope, entry, update_attrs)
+      assert entry.issue_key == nil
+      assert entry.issue_summary == nil
+      assert entry.issue_type == nil
+      assert entry.issue_status == nil
+      assert entry.initiative_key == nil
+      assert entry.initiative_summary == nil
     end
   end
 end

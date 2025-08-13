@@ -62,7 +62,9 @@ defmodule ExAutomationWeb.EntryLive.Form do
 
   @impl true
   def handle_event("validate", %{"entry" => entry_params}, socket) do
-    changeset = Reporting.change_entry(socket.assigns.current_scope, socket.assigns.entry, entry_params)
+    changeset =
+      Reporting.change_entry(socket.assigns.current_scope, socket.assigns.entry, entry_params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 

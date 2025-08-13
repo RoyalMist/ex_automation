@@ -65,6 +65,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
   @impl true
   def handle_info({type, %ExAutomation.Reporting.Report{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :reports, Reporting.list_reports(socket.assigns.current_scope), reset: true)}
+    {:noreply,
+     stream(socket, :reports, Reporting.list_reports(socket.assigns.current_scope), reset: true)}
   end
 end

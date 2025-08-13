@@ -20,8 +20,20 @@ defmodule ExAutomation.Reporting.Entry do
   @doc false
   def changeset(entry, attrs, user_scope) do
     entry
-    |> cast(attrs, [:release_name, :release_date, :issue_key, :issue_summary, :issue_type, :issue_status, :initiative_key, :initiative_summary])
-    |> validate_required([:release_name, :release_date, :issue_key, :issue_summary, :issue_type, :issue_status, :initiative_key, :initiative_summary])
+    |> cast(attrs, [
+      :release_name,
+      :release_date,
+      :issue_key,
+      :issue_summary,
+      :issue_type,
+      :issue_status,
+      :initiative_key,
+      :initiative_summary
+    ])
+    |> validate_required([
+      :release_name,
+      :release_date
+    ])
     |> put_change(:user_id, user_scope.user.id)
   end
 end

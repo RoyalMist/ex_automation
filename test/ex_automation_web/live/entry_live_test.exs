@@ -4,9 +4,36 @@ defmodule ExAutomationWeb.EntryLiveTest do
   import Phoenix.LiveViewTest
   import ExAutomation.ReportingFixtures
 
-  @create_attrs %{release_name: "some release_name", release_date: "2025-08-12T12:26:00", issue_key: "some issue_key", issue_summary: "some issue_summary", issue_type: "some issue_type", issue_status: "some issue_status", initiative_key: "some initiative_key", initiative_summary: "some initiative_summary"}
-  @update_attrs %{release_name: "some updated release_name", release_date: "2025-08-13T12:26:00", issue_key: "some updated issue_key", issue_summary: "some updated issue_summary", issue_type: "some updated issue_type", issue_status: "some updated issue_status", initiative_key: "some updated initiative_key", initiative_summary: "some updated initiative_summary"}
-  @invalid_attrs %{release_name: nil, release_date: nil, issue_key: nil, issue_summary: nil, issue_type: nil, issue_status: nil, initiative_key: nil, initiative_summary: nil}
+  @create_attrs %{
+    release_name: "some release_name",
+    release_date: "2025-08-12T12:26:00",
+    issue_key: "some issue_key",
+    issue_summary: "some issue_summary",
+    issue_type: "some issue_type",
+    issue_status: "some issue_status",
+    initiative_key: "some initiative_key",
+    initiative_summary: "some initiative_summary"
+  }
+  @update_attrs %{
+    release_name: "some updated release_name",
+    release_date: "2025-08-13T12:26:00",
+    issue_key: "some updated issue_key",
+    issue_summary: "some updated issue_summary",
+    issue_type: "some updated issue_type",
+    issue_status: "some updated issue_status",
+    initiative_key: "some updated initiative_key",
+    initiative_summary: "some updated initiative_summary"
+  }
+  @invalid_attrs %{
+    release_name: nil,
+    release_date: nil,
+    issue_key: nil,
+    issue_summary: nil,
+    issue_type: nil,
+    issue_status: nil,
+    initiative_key: nil,
+    initiative_summary: nil
+  }
 
   setup :register_and_log_in_user
 

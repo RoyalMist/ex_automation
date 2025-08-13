@@ -71,6 +71,7 @@ defmodule ExAutomationWeb.EntryLive.Index do
   @impl true
   def handle_info({type, %ExAutomation.Reporting.Entry{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :entries, Reporting.list_entries(socket.assigns.current_scope), reset: true)}
+    {:noreply,
+     stream(socket, :entries, Reporting.list_entries(socket.assigns.current_scope), reset: true)}
   end
 end

@@ -56,7 +56,9 @@ defmodule ExAutomationWeb.ReportLive.Form do
 
   @impl true
   def handle_event("validate", %{"report" => report_params}, socket) do
-    changeset = Reporting.change_report(socket.assigns.current_scope, socket.assigns.report, report_params)
+    changeset =
+      Reporting.change_report(socket.assigns.current_scope, socket.assigns.report, report_params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -65,7 +67,11 @@ defmodule ExAutomationWeb.ReportLive.Form do
   end
 
   defp save_report(socket, :edit, report_params) do
-    case Reporting.update_report(socket.assigns.current_scope, socket.assigns.report, report_params) do
+    case Reporting.update_report(
+           socket.assigns.current_scope,
+           socket.assigns.report,
+           report_params
+         ) do
       {:ok, report} ->
         {:noreply,
          socket
