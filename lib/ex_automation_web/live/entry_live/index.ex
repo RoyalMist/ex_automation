@@ -33,15 +33,6 @@ defmodule ExAutomationWeb.EntryLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/entries/#{entry}"}>Show</.link>
           </div>
-          <.link navigate={~p"/entries/#{entry}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, entry}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: entry.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
         </:action>
       </.table>
     </Layouts.app>
@@ -61,16 +52,8 @@ defmodule ExAutomationWeb.EntryLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    entry = Reporting.get_entry!(socket.assigns.current_scope, id)
-    {:ok, _} = Reporting.delete_entry(socket.assigns.current_scope, entry)
-
-    {:noreply, stream_delete(socket, :entries, entry)}
-  end
-
-  @impl true
   def handle_info({type, %ExAutomation.Reporting.Entry{}}, socket)
-      when type in [:created, :updated, :deleted] do
+      when type in [:created] do
     {:noreply,
      stream(socket, :entries, Reporting.list_entries(socket.assigns.current_scope), reset: true)}
   end

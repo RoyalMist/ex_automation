@@ -27,7 +27,6 @@ defmodule ExAutomationWeb.ReportLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/reports/#{report}"}>Show</.link>
           </div>
-          <.link navigate={~p"/reports/#{report}/edit"}>Edit</.link>
         </:action>
         <:action :let={{id, report}}>
           <.link
@@ -64,7 +63,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
 
   @impl true
   def handle_info({type, %ExAutomation.Reporting.Report{}}, socket)
-      when type in [:created, :updated, :deleted] do
+      when type in [:created, :deleted] do
     {:noreply,
      stream(socket, :reports, Reporting.list_reports(socket.assigns.current_scope), reset: true)}
   end

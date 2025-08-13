@@ -5,7 +5,6 @@ defmodule ExAutomationWeb.ReportLiveTest do
   import ExAutomation.ReportingFixtures
 
   @create_attrs %{name: "some name", year: 42}
-  @update_attrs %{name: "some updated name", year: 43}
   @invalid_attrs %{name: nil, year: nil}
 
   setup :register_and_log_in_user
@@ -52,32 +51,6 @@ defmodule ExAutomationWeb.ReportLiveTest do
       assert html =~ "some name"
     end
 
-    test "updates report in listing", %{conn: conn, report: report} do
-      {:ok, index_live, _html} = live(conn, ~p"/reports")
-
-      assert {:ok, form_live, _html} =
-               index_live
-               |> element("#reports-#{report.id} a", "Edit")
-               |> render_click()
-               |> follow_redirect(conn, ~p"/reports/#{report}/edit")
-
-      assert render(form_live) =~ "Edit Report"
-
-      assert form_live
-             |> form("#report-form", report: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert {:ok, index_live, _html} =
-               form_live
-               |> form("#report-form", report: @update_attrs)
-               |> render_submit()
-               |> follow_redirect(conn, ~p"/reports")
-
-      html = render(index_live)
-      assert html =~ "Report updated successfully"
-      assert html =~ "some updated name"
-    end
-
     test "deletes report in listing", %{conn: conn, report: report} do
       {:ok, index_live, _html} = live(conn, ~p"/reports")
 
@@ -94,32 +67,6 @@ defmodule ExAutomationWeb.ReportLiveTest do
 
       assert html =~ "Show Report"
       assert html =~ report.name
-    end
-
-    test "updates report and returns to show", %{conn: conn, report: report} do
-      {:ok, show_live, _html} = live(conn, ~p"/reports/#{report}")
-
-      assert {:ok, form_live, _} =
-               show_live
-               |> element("a", "Edit")
-               |> render_click()
-               |> follow_redirect(conn, ~p"/reports/#{report}/edit?return_to=show")
-
-      assert render(form_live) =~ "Edit Report"
-
-      assert form_live
-             |> form("#report-form", report: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert {:ok, show_live, _html} =
-               form_live
-               |> form("#report-form", report: @update_attrs)
-               |> render_submit()
-               |> follow_redirect(conn, ~p"/reports/#{report}")
-
-      html = render(show_live)
-      assert html =~ "Report updated successfully"
-      assert html =~ "some updated name"
     end
   end
 end

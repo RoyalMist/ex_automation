@@ -15,7 +15,6 @@ defmodule ExAutomation.Reporting do
   The broadcasted messages match the pattern:
 
     * {:created, %Report{}}
-    * {:updated, %Report{}}
     * {:deleted, %Report{}}
 
   """
@@ -85,30 +84,6 @@ defmodule ExAutomation.Reporting do
   end
 
   @doc """
-  Updates a report.
-
-  ## Examples
-
-      iex> update_report(scope, report, %{field: new_value})
-      {:ok, %Report{}}
-
-      iex> update_report(scope, report, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_report(%Scope{} = scope, %Report{} = report, attrs) do
-    true = report.user_id == scope.user.id
-
-    with {:ok, report = %Report{}} <-
-           report
-           |> Report.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, report})
-      {:ok, report}
-    end
-  end
-
-  @doc """
   Deletes a report.
 
   ## Examples
@@ -130,21 +105,6 @@ defmodule ExAutomation.Reporting do
     end
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking report changes.
-
-  ## Examples
-
-      iex> change_report(scope, report)
-      %Ecto.Changeset{data: %Report{}}
-
-  """
-  def change_report(%Scope{} = scope, %Report{} = report, attrs \\ %{}) do
-    true = report.user_id == scope.user.id
-
-    Report.changeset(report, attrs, scope)
-  end
-
   alias ExAutomation.Reporting.Entry
   alias ExAutomation.Accounts.Scope
 
@@ -154,8 +114,6 @@ defmodule ExAutomation.Reporting do
   The broadcasted messages match the pattern:
 
     * {:created, %Entry{}}
-    * {:updated, %Entry{}}
-    * {:deleted, %Entry{}}
 
   """
   def subscribe_entries(%Scope{} = scope) do
@@ -215,66 +173,5 @@ defmodule ExAutomation.Reporting do
       broadcast(scope, {:created, entry})
       {:ok, entry}
     end
-  end
-
-  @doc """
-  Updates a entry.
-
-  ## Examples
-
-      iex> update_entry(scope, entry, %{field: new_value})
-      {:ok, %Entry{}}
-
-      iex> update_entry(scope, entry, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_entry(%Scope{} = scope, %Entry{} = entry, attrs) do
-    true = entry.user_id == scope.user.id
-
-    with {:ok, entry = %Entry{}} <-
-           entry
-           |> Entry.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast(scope, {:updated, entry})
-      {:ok, entry}
-    end
-  end
-
-  @doc """
-  Deletes a entry.
-
-  ## Examples
-
-      iex> delete_entry(scope, entry)
-      {:ok, %Entry{}}
-
-      iex> delete_entry(scope, entry)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_entry(%Scope{} = scope, %Entry{} = entry) do
-    true = entry.user_id == scope.user.id
-
-    with {:ok, entry = %Entry{}} <-
-           Repo.delete(entry) do
-      broadcast(scope, {:deleted, entry})
-      {:ok, entry}
-    end
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking entry changes.
-
-  ## Examples
-
-      iex> change_entry(scope, entry)
-      %Ecto.Changeset{data: %Entry{}}
-
-  """
-  def change_entry(%Scope{} = scope, %Entry{} = entry, attrs \\ %{}) do
-    true = entry.user_id == scope.user.id
-
-    Entry.changeset(entry, attrs, scope)
   end
 end

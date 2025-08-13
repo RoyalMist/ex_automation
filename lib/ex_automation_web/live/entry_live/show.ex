@@ -14,9 +14,6 @@ defmodule ExAutomationWeb.EntryLive.Show do
           <.button navigate={~p"/entries"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/entries/#{@entry}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit entry
-          </.button>
         </:actions>
       </.header>
 
@@ -47,25 +44,8 @@ defmodule ExAutomationWeb.EntryLive.Show do
   end
 
   @impl true
-  def handle_info(
-        {:updated, %ExAutomation.Reporting.Entry{id: id} = entry},
-        %{assigns: %{entry: %{id: id}}} = socket
-      ) do
-    {:noreply, assign(socket, :entry, entry)}
-  end
-
-  def handle_info(
-        {:deleted, %ExAutomation.Reporting.Entry{id: id}},
-        %{assigns: %{entry: %{id: id}}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> put_flash(:error, "The current entry was deleted.")
-     |> push_navigate(to: ~p"/entries")}
-  end
-
   def handle_info({type, %ExAutomation.Reporting.Entry{}}, socket)
-      when type in [:created, :updated, :deleted] do
+      when type in [:created] do
     {:noreply, socket}
   end
 end

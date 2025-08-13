@@ -14,9 +14,6 @@ defmodule ExAutomationWeb.ReportLive.Show do
           <.button navigate={~p"/reports"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/reports/#{@report}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit report
-          </.button>
         </:actions>
       </.header>
 
@@ -42,13 +39,6 @@ defmodule ExAutomationWeb.ReportLive.Show do
 
   @impl true
   def handle_info(
-        {:updated, %ExAutomation.Reporting.Report{id: id} = report},
-        %{assigns: %{report: %{id: id}}} = socket
-      ) do
-    {:noreply, assign(socket, :report, report)}
-  end
-
-  def handle_info(
         {:deleted, %ExAutomation.Reporting.Report{id: id}},
         %{assigns: %{report: %{id: id}}} = socket
       ) do
@@ -59,7 +49,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
   end
 
   def handle_info({type, %ExAutomation.Reporting.Report{}}, socket)
-      when type in [:created, :updated, :deleted] do
+      when type in [:created, :deleted] do
     {:noreply, socket}
   end
 end

@@ -42,49 +42,25 @@ defmodule ExAutomationWeb.EntryLive.Form do
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    entry = Reporting.get_entry!(socket.assigns.current_scope, id)
-
-    socket
-    |> assign(:page_title, "Edit Entry")
-    |> assign(:entry, entry)
-    |> assign(:form, to_form(Reporting.change_entry(socket.assigns.current_scope, entry)))
-  end
-
   defp apply_action(socket, :new, _params) do
     entry = %Entry{user_id: socket.assigns.current_scope.user.id}
 
     socket
     |> assign(:page_title, "New Entry")
     |> assign(:entry, entry)
-    |> assign(:form, to_form(Reporting.change_entry(socket.assigns.current_scope, entry)))
+    |> assign(:form, to_form(Entry.changeset(%Entry{}, %{}, socket.assigns.current_scope)))
   end
 
   @impl true
   def handle_event("validate", %{"entry" => entry_params}, socket) do
     changeset =
-      Reporting.change_entry(socket.assigns.current_scope, socket.assigns.entry, entry_params)
+      Entry.changeset(socket.assigns.entry, entry_params, socket.assigns.current_scope)
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
   def handle_event("save", %{"entry" => entry_params}, socket) do
     save_entry(socket, socket.assigns.live_action, entry_params)
-  end
-
-  defp save_entry(socket, :edit, entry_params) do
-    case Reporting.update_entry(socket.assigns.current_scope, socket.assigns.entry, entry_params) do
-      {:ok, entry} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Entry updated successfully")
-         |> push_navigate(
-           to: return_path(socket.assigns.current_scope, socket.assigns.return_to, entry)
-         )}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
   end
 
   defp save_entry(socket, :new, entry_params) do
