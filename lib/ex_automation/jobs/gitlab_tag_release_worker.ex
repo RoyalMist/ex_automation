@@ -1,5 +1,5 @@
 defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
-  use Oban.Worker, queue: :data, priority: 3, max_attempts: 5
+  use Oban.Worker, queue: :data, priority: 3, max_attempts: 2
   alias ExAutomation.Gitlab
 
   @impl Oban.Worker
