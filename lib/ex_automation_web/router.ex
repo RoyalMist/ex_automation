@@ -49,6 +49,10 @@ defmodule ExAutomationWeb.Router do
       live "/reports/new", ReportLive.Form, :new
       live "/reports/:id", ReportLive.Show, :show
       live "/reports/:id/edit", ReportLive.Form, :edit
+      live "/entries", EntryLive.Index, :index
+      live "/entries/new", EntryLive.Form, :new
+      live "/entries/:id", EntryLive.Show, :show
+      live "/entries/:id/edit", EntryLive.Form, :edit
     end
 
     post "/users/update-password", UserSessionController, :update_password
