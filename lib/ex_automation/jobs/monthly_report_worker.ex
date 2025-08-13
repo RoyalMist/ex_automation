@@ -19,8 +19,14 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
     scope = Scope.for_user(%User{id: user_id})
     issue = Jira.get_issue_by_key!(tag)
     initiative = get_initiative(issue)
-    initiative_key = if initiative.key != issue.key, do: initiative.key(else: "")
-    initiative_summary = if initiative.key != issue.key, do: initiative.summary(else: "")
+
+    # If the issue has a parent, use parent as initiative; otherwise use the issue itself
+    {initiative_key, initiative_summary} =
+      if initiative.key != issue.key do
+        {initiative.key, initiative.summary}
+      else
+        {issue.key, issue.summary}
+      end
 
     Reporting.create_entry(scope, %{
       report_id: report_id,
@@ -42,11 +48,25 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
     releases = ExAutomation.Gitlab.list_releases_by_year(report.year)
 
     for release <- releases do
+      # Create basic entry for the release
       Reporting.create_entry(scope, %{
         report_id: report_id,
         release_name: release.name,
         release_date: release.date
       })
+
+      # If release has tags, enqueue tag-specific jobs for Jira integration
+      for tag <- release.tags do
+        %{
+          user_id: user_id,
+          report_id: report_id,
+          release_name: release.name,
+          release_date: NaiveDateTime.to_iso8601(release.date),
+          tag: tag
+        }
+        |> ExAutomation.Jobs.MonthlyReportWorker.new()
+        |> Oban.insert()
+      end
     end
 
     :ok

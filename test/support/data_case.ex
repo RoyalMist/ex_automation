@@ -55,11 +55,4 @@ defmodule ExAutomation.DataCase do
       end)
     end)
   end
-
-  @doc """
-  Helper to perform an Oban job for testing purposes.
-  """
-  def perform_job(worker_module, args) do
-    worker_module.perform(%Oban.Job{args: args})
-  end
 end
