@@ -13,7 +13,7 @@ defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
     Gitlab.update_release(release, %{tags: tags})
 
     for tag <- tags do
-      ExAutomation.Jobs.JiraFetchIssueWorker.find_ticket(tag)
+      ExAutomation.Jobs.JiraFetchIssueWorker.find_ticket(tag, nil)
     end
   end
 end
