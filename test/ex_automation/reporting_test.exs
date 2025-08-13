@@ -39,6 +39,70 @@ defmodule ExAutomation.ReportingTest do
       assert report.user_id == scope.user.id
     end
 
+    test "create_report/2 creates entries via MonthlyReportWorker job" do
+      valid_attrs = %{name: "test report", year: 2024}
+      scope = user_scope_fixture()
+
+      # Create some test releases for the year
+      _release1 =
+        ExAutomation.GitlabFixtures.release_fixture(%{
+          name: "v1.0.0",
+          date: ~N[2024-01-15 10:00:00],
+          description: "First release"
+        })
+
+      _release2 =
+        ExAutomation.GitlabFixtures.release_fixture(%{
+          name: "v1.1.0",
+          date: ~N[2024-06-15 10:00:00],
+          description: "Second release"
+        })
+
+      # Count entries before
+      entries_before = Enum.count(Reporting.list_entries(scope))
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+
+      # Process the job that was enqueued
+      perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
+        "report_id" => report.id,
+        "user_id" => scope.user.id
+      })
+
+      # Verify entries were created
+      entries_after = Reporting.list_entries(scope)
+      assert Enum.count(entries_after) == entries_before + 2
+
+      # Verify entries have correct release names
+      entry_names = Enum.map(entries_after, & &1.release_name)
+      assert "v1.0.0" in entry_names
+      assert "v1.1.0" in entry_names
+    end
+
+    test "MonthlyReportWorker handles year with no releases gracefully" do
+      valid_attrs = %{name: "empty year report", year: 2020}
+      scope = user_scope_fixture()
+
+      # Count entries before
+      entries_before = Enum.count(Reporting.list_entries(scope))
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+
+      # Process the job that was enqueued (no releases for 2020)
+      result =
+        perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
+          "report_id" => report.id,
+          "user_id" => scope.user.id
+        })
+
+      # Job should complete successfully even with no releases
+      assert result == :ok
+
+      # Verify no new entries were created
+      entries_after = Reporting.list_entries(scope)
+      assert Enum.count(entries_after) == entries_before
+    end
+
     test "create_report/2 with invalid data returns error changeset" do
       scope = user_scope_fixture()
       assert {:error, %Ecto.Changeset{}} = Reporting.create_report(scope, @invalid_attrs)

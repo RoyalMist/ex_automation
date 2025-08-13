@@ -79,6 +79,12 @@ defmodule ExAutomation.Reporting do
            |> Report.changeset(attrs, scope)
            |> Repo.insert() do
       broadcast(scope, {:created, report})
+
+      # Enqueue the monthly report worker job
+      %{scope: scope, report_id: report.id}
+      |> ExAutomation.Jobs.MonthlyReportWorker.new()
+      |> Oban.insert()
+
       {:ok, report}
     end
   end
