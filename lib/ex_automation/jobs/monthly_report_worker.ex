@@ -7,22 +7,6 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
   alias ExAutomation.Accounts.Scope
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"user_id" => user_id, "report_id" => report_id}}) do
-    scope = Scope.for_user(%User{id: user_id})
-    report = Reporting.get_report!(scope, report_id)
-    releases = ExAutomation.Gitlab.list_releases_by_year(report.year)
-
-    for release <- releases do
-      Reporting.create_entry(scope, %{
-        release_name: release.name,
-        release_date: release.date
-      })
-    end
-
-    :ok
-  end
-
-  @impl Oban.Worker
   def perform(%Oban.Job{
         args: %{
           "user_id" => user_id,
@@ -49,6 +33,22 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
       initiative_key: initiative_key,
       initiative_summary: initiative_summary
     })
+  end
+
+  @impl Oban.Worker
+  def perform(%Oban.Job{args: %{"user_id" => user_id, "report_id" => report_id}}) do
+    scope = Scope.for_user(%User{id: user_id})
+    report = Reporting.get_report!(scope, report_id)
+    releases = ExAutomation.Gitlab.list_releases_by_year(report.year)
+
+    for release <- releases do
+      Reporting.create_entry(scope, %{
+        release_name: release.name,
+        release_date: release.date
+      })
+    end
+
+    :ok
   end
 
   defp get_initiative(%Issue{parent_id: parent_id}) when parent_id != nil do
