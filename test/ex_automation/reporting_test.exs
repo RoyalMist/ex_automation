@@ -1,5 +1,6 @@
 defmodule ExAutomation.ReportingTest do
   use ExAutomation.DataCase
+  import Ecto.Query
 
   alias ExAutomation.Reporting
 
@@ -138,6 +139,42 @@ defmodule ExAutomation.ReportingTest do
       assert entry.initiative_key == "INIT-456"
       assert entry.initiative_summary == "Test initiative"
       assert entry.user_id == scope.user.id
+    end
+
+    test "delete_report/2 cascades delete to related entries" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      # Create entries associated with the report
+      entry1 = entry_fixture(scope, %{release_name: "Entry 1"})
+      entry2 = entry_fixture(scope, %{release_name: "Entry 2"})
+
+      # Update entries to be associated with the report
+      {1, _} =
+        ExAutomation.Repo.update_all(
+          from(e in Entry, where: e.id == ^entry1.id),
+          set: [report_id: report.id]
+        )
+
+      {1, _} =
+        ExAutomation.Repo.update_all(
+          from(e in Entry, where: e.id == ^entry2.id),
+          set: [report_id: report.id]
+        )
+
+      # Verify entries exist and are associated with the report
+      assert ExAutomation.Repo.get!(Entry, entry1.id).report_id == report.id
+      assert ExAutomation.Repo.get!(Entry, entry2.id).report_id == report.id
+
+      # Delete the report
+      assert {:ok, %Reporting.Report{}} = Reporting.delete_report(scope, report)
+
+      # Verify report is deleted
+      assert_raise Ecto.NoResultsError, fn -> Reporting.get_report!(scope, report.id) end
+
+      # Verify entries are cascade deleted
+      assert_raise Ecto.NoResultsError, fn -> ExAutomation.Repo.get!(Entry, entry1.id) end
+      assert_raise Ecto.NoResultsError, fn -> ExAutomation.Repo.get!(Entry, entry2.id) end
     end
   end
 end
