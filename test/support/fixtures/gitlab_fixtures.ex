@@ -22,12 +22,13 @@ defmodule ExAutomation.GitlabFixtures do
 
     {:ok, release} = ExAutomation.Gitlab.create_release(create_attrs)
 
-    # Update with tags if provided
-    with tags when not is_nil(tags) <- tags do
-      {:ok, release} = ExAutomation.Gitlab.update_release(release, %{tags: tags})
-      release
-    else
-      _ -> release
+    case tags do
+      nil ->
+        release
+
+      tags ->
+        {:ok, release} = ExAutomation.Gitlab.update_release(release, %{tags: tags})
+        release
     end
   end
 end
