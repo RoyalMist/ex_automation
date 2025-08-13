@@ -16,7 +16,7 @@ config :ex_automation, :scopes,
 config :ex_automation, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [data: 5, reports: 2],
+  queues: [data: 10, reports: 2],
   repo: ExAutomation.Repo,
   plugins: [
     {Oban.Plugins.Pruner, max_age: 600},
