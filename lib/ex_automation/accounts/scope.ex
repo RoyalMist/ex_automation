@@ -18,6 +18,7 @@ defmodule ExAutomation.Accounts.Scope do
 
   alias ExAutomation.Accounts.User
 
+  @derive {Jason.Encoder, only: [:user]}
   defstruct user: nil
 
   @doc """

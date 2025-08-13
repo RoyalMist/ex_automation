@@ -81,7 +81,7 @@ defmodule ExAutomation.Reporting do
       broadcast(scope, {:created, report})
 
       # Enqueue the monthly report worker job
-      %{scope: scope, report_id: report.id}
+      %{user_id: scope.user.id, report_id: report.id}
       |> ExAutomation.Jobs.MonthlyReportWorker.new()
       |> Oban.insert()
 
