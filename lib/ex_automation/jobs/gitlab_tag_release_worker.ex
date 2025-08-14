@@ -15,5 +15,7 @@ defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
     for tag <- tags do
       ExAutomation.Jobs.JiraFetchIssueWorker.find_ticket(tag, nil)
     end
+
+    :ok
   end
 end
