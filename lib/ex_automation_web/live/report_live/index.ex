@@ -1,6 +1,5 @@
 defmodule ExAutomationWeb.ReportLive.Index do
   use ExAutomationWeb, :live_view
-
   alias ExAutomation.Reporting
 
   @impl true
@@ -57,7 +56,6 @@ defmodule ExAutomationWeb.ReportLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     report = Reporting.get_report!(socket.assigns.current_scope, id)
     {:ok, _} = Reporting.delete_report(socket.assigns.current_scope, report)
-
     {:noreply, stream_delete(socket, :reports, report)}
   end
 

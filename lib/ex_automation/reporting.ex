@@ -22,7 +22,7 @@ defmodule ExAutomation.Reporting do
     Phoenix.PubSub.subscribe(ExAutomation.PubSub, "user:#{key}:reports")
   end
 
-  defp broadcast(%Scope{} = scope, message) do
+  defp broadcast_reports(%Scope{} = scope, message) do
     key = scope.user.id
     Phoenix.PubSub.broadcast(ExAutomation.PubSub, "user:#{key}:reports", message)
   end
@@ -75,7 +75,7 @@ defmodule ExAutomation.Reporting do
            %Report{}
            |> Report.changeset(attrs, scope)
            |> Repo.insert() do
-      broadcast(scope, {:created, report})
+      broadcast_reports(scope, {:created, report})
 
       %{user_id: scope.user.id, report_id: report.id}
       |> ExAutomation.Jobs.MonthlyReportWorker.new()
@@ -102,7 +102,7 @@ defmodule ExAutomation.Reporting do
 
     with {:ok, report = %Report{}} <-
            Repo.delete(report) do
-      broadcast(scope, {:deleted, report})
+      broadcast_reports(scope, {:deleted, report})
       {:ok, report}
     end
   end
@@ -120,8 +120,12 @@ defmodule ExAutomation.Reporting do
   """
   def subscribe_entries(%Scope{} = scope) do
     key = scope.user.id
-
     Phoenix.PubSub.subscribe(ExAutomation.PubSub, "user:#{key}:entries")
+  end
+
+  defp broadcast_entries(%Scope{} = scope, message) do
+    key = scope.user.id
+    Phoenix.PubSub.broadcast(ExAutomation.PubSub, "user:#{key}:entries", message)
   end
 
   @doc """
@@ -175,7 +179,7 @@ defmodule ExAutomation.Reporting do
            %Entry{}
            |> Entry.changeset(attrs, scope)
            |> Repo.insert() do
-      broadcast(scope, {:created, entry})
+      broadcast_entries(scope, {:created, entry})
       {:ok, entry}
     end
   end
