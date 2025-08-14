@@ -47,7 +47,7 @@ defmodule ExAutomation.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:igniter, "~> 0.5", only: [:dev, :test], runtime: false},
+      {:igniter, "~> 0.6", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.2"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:mix_audit, "~> 2.0"},
