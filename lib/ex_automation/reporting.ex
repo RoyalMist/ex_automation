@@ -5,7 +5,6 @@ defmodule ExAutomation.Reporting do
 
   import Ecto.Query, warn: false
   alias ExAutomation.Repo
-
   alias ExAutomation.Reporting.Report
   alias ExAutomation.Accounts.Scope
 
@@ -20,13 +19,11 @@ defmodule ExAutomation.Reporting do
   """
   def subscribe_reports(%Scope{} = scope) do
     key = scope.user.id
-
     Phoenix.PubSub.subscribe(ExAutomation.PubSub, "user:#{key}:reports")
   end
 
   defp broadcast(%Scope{} = scope, message) do
     key = scope.user.id
-
     Phoenix.PubSub.broadcast(ExAutomation.PubSub, "user:#{key}:reports", message)
   end
 
@@ -80,11 +77,9 @@ defmodule ExAutomation.Reporting do
            |> Repo.insert() do
       broadcast(scope, {:created, report})
 
-      Task.start(fn ->
-        %{user_id: scope.user.id, report_id: report.id}
-        |> ExAutomation.Jobs.MonthlyReportWorker.new()
-        |> Oban.insert()
-      end)
+      %{user_id: scope.user.id, report_id: report.id}
+      |> ExAutomation.Jobs.MonthlyReportWorker.new()
+      |> Oban.insert()
 
       {:ok, report}
     end
