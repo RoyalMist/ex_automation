@@ -98,11 +98,11 @@ jobs:
       - if: ${{ contains(github.ref, 'refs/tags/') }}
         uses: docker/setup-buildx-action@v3
       - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: 1password/load-secrets-action/configure@v2
+        uses: 1password/load-secrets-action/configure@v3
         with:
           service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: 1password/load-secrets-action@v2
+        uses: 1password/load-secrets-action@v3
         with:
           export-env: true
         env:
