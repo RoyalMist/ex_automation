@@ -33,6 +33,7 @@ defmodule ExAutomation.MixProject do
 
   defp deps do
     [
+      {:tidewave, "~> 0.3", only: [:dev]},
       {:bandit, "~> 1.5"},
       {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.0"},
