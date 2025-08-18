@@ -34,6 +34,7 @@ defmodule ExAutomation.Reporting.Report do
     field :year, :integer
     field :user_id, :id
     field :entries, {:array, :map}, default: []
+    field :complete, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -41,7 +42,7 @@ defmodule ExAutomation.Reporting.Report do
   @doc false
   def changeset(report, attrs, user_scope) do
     report
-    |> cast(attrs, [:name, :year, :entries])
+    |> cast(attrs, [:name, :year, :entries, :complete])
     |> validate_required([:name, :year])
     |> put_change(:user_id, user_scope.user.id)
   end

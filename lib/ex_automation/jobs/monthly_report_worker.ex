@@ -6,6 +6,8 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
   alias ExAutomation.Jira.Issue
   alias ExAutomation.Reporting
 
+  require Logger
+
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"user_id" => user_id, "report_id" => report_id}}) do
     scope = Scope.for_user(%User{id: user_id})

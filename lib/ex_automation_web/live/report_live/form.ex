@@ -16,6 +16,7 @@ defmodule ExAutomationWeb.ReportLive.Form do
       <.form for={@form} id="report-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:year]} type="number" label="Year" />
+        <.input field={@form[:complete]} type="checkbox" label="Complete" />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Report</.button>
           <.button navigate={return_path(@current_scope, @return_to, @report)}>Cancel</.button>

@@ -20,6 +20,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       <.list>
         <:item title="Name">{@report.name}</:item>
         <:item title="Year">{@report.year}</:item>
+        <:item title="Complete">{if @report.complete, do: "Yes", else: "No"}</:item>
       </.list>
     </Layouts.app>
     """

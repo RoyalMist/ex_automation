@@ -38,6 +38,7 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 42
       assert report.user_id == scope.user.id
       assert report.entries == []
+      assert report.complete == false
     end
 
     test "create_report/2 with entries creates a report with entries" do
@@ -54,6 +55,7 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 2023
       assert report.user_id == scope.user.id
       assert report.entries == entries_data
+      assert report.complete == false
     end
 
     test "create_report/2 with invalid entries data fails validation gracefully" do
@@ -63,6 +65,19 @@ defmodule ExAutomation.ReportingTest do
 
       assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
       assert report.entries == []
+      assert report.complete == false
+    end
+
+    test "create_report/2 with complete field set to true creates a completed report" do
+      valid_attrs = %{name: "completed report", year: 2023, complete: true}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.name == "completed report"
+      assert report.year == 2023
+      assert report.user_id == scope.user.id
+      assert report.entries == []
+      assert report.complete == true
     end
 
     test "update_report/3 can update entries" do
@@ -79,6 +94,29 @@ defmodule ExAutomation.ReportingTest do
                Reporting.update_report(scope, report, update_attrs)
 
       assert updated_report.entries == new_entries
+    end
+
+    test "update_report/3 can update complete field" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      # Initially complete should be false
+      assert report.complete == false
+
+      update_attrs = %{complete: true}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.update_report(scope, report, update_attrs)
+
+      assert updated_report.complete == true
+
+      # Test updating back to false
+      update_attrs = %{complete: false}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.update_report(scope, report, update_attrs)
+
+      assert updated_report.complete == false
     end
 
     test "entries field accepts complex nested JSON structures" do
