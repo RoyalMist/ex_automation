@@ -28,17 +28,20 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
         {"", ""}
       end
 
-    Reporting.create_entry(scope, %{
-      report_id: report_id,
-      release_name: release_name,
-      release_date: release_date,
-      issue_key: issue.key,
-      issue_summary: issue.summary,
-      issue_type: issue.type,
-      issue_status: issue.status,
-      initiative_key: initiative_key,
-      initiative_summary: initiative_summary
-    })
+    report = Reporting.get_report!(scope, report_id)
+
+    entry_data = %{
+      "release_name" => release_name,
+      "release_date" => release_date,
+      "issue_key" => issue.key,
+      "issue_summary" => issue.summary,
+      "issue_type" => issue.type,
+      "issue_status" => issue.status,
+      "initiative_key" => initiative_key,
+      "initiative_summary" => initiative_summary
+    }
+
+    Reporting.add_entry_to_report(scope, report, entry_data)
   end
 
   @impl Oban.Worker
@@ -48,12 +51,16 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
     releases = ExAutomation.Gitlab.list_releases_by_year(report.year)
 
     for release <- releases do
+      # Reload report to ensure we have the latest entries
+      current_report = Reporting.get_report!(scope, report_id)
+
       # Create basic entry for the release
-      Reporting.create_entry(scope, %{
-        report_id: report_id,
-        release_name: release.name,
-        release_date: release.date
-      })
+      basic_entry = %{
+        "release_name" => release.name,
+        "release_date" => NaiveDateTime.to_iso8601(release.date)
+      }
+
+      Reporting.add_entry_to_report(scope, current_report, basic_entry)
 
       # If release has tags, enqueue tag-specific jobs for Jira integration
       for tag <- release.tags do
