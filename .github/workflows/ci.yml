@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v3
   lint:
     name: LINT
     needs: [tools]
@@ -25,7 +25,7 @@ jobs:
       MIX_ENV: dev
     steps:
       - uses: actions/checkout@v5
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v3
       - uses: actions/cache@v4
         with:
           path: |
@@ -63,7 +63,7 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v5
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v3
       - uses: actions/cache@v4
         with:
           path: |
@@ -83,7 +83,7 @@ jobs:
       MIX_ENV: prod
     steps:
       - uses: actions/checkout@v5
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@v3
       - uses: actions/cache@v4
         with:
           path: |
