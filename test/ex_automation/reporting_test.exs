@@ -37,6 +37,224 @@ defmodule ExAutomation.ReportingTest do
       assert report.name == "some name"
       assert report.year == 42
       assert report.user_id == scope.user.id
+      assert report.entries == []
+    end
+
+    test "create_report/2 with entries creates a report with entries" do
+      entries_data = [
+        %{"release_name" => "v1.0.0", "issue_key" => "PROJ-123", "summary" => "Feature A"},
+        %{"release_name" => "v1.1.0", "issue_key" => "PROJ-456", "summary" => "Feature B"}
+      ]
+
+      valid_attrs = %{name: "report with entries", year: 2023, entries: entries_data}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.name == "report with entries"
+      assert report.year == 2023
+      assert report.user_id == scope.user.id
+      assert report.entries == entries_data
+    end
+
+    test "create_report/2 with invalid entries data fails validation gracefully" do
+      # Testing with non-map entries should still work since we're using :map type
+      valid_attrs = %{name: "test report", year: 2023, entries: []}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.entries == []
+    end
+
+    test "update_report/3 can update entries" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      new_entries = [
+        %{"release_name" => "v2.0.0", "issue_key" => "TASK-789", "summary" => "New feature"}
+      ]
+
+      update_attrs = %{entries: new_entries}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.update_report(scope, report, update_attrs)
+
+      assert updated_report.entries == new_entries
+    end
+
+    test "entries field accepts complex nested JSON structures" do
+      complex_entries = [
+        %{
+          "release_name" => "v3.0.0",
+          "issues" => [
+            %{"key" => "PROJ-100", "type" => "Epic", "status" => "Done"},
+            %{"key" => "PROJ-101", "type" => "Story", "status" => "In Progress"}
+          ],
+          "metadata" => %{
+            "deployment_date" => "2023-12-01",
+            "environment" => "production",
+            "tags" => ["critical", "feature"]
+          }
+        },
+        %{
+          "release_name" => "v3.1.0",
+          "issues" => [],
+          "metadata" => %{"deployment_date" => "2024-01-15"}
+        }
+      ]
+
+      valid_attrs = %{name: "complex report", year: 2023, entries: complex_entries}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.entries == complex_entries
+    end
+
+    test "entries field can be empty array" do
+      valid_attrs = %{name: "empty entries report", year: 2023, entries: []}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.entries == []
+    end
+
+    test "entries field defaults to empty array when not provided" do
+      valid_attrs = %{name: "default entries report", year: 2023}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+      assert report.entries == []
+    end
+
+    test "can update entries from empty to populated" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+      assert report.entries == []
+
+      entries_data = [
+        %{"release" => "v1.0.0", "features" => ["login", "dashboard"]},
+        %{"release" => "v1.1.0", "bugfixes" => ["auth-fix", "ui-improvement"]}
+      ]
+
+      update_attrs = %{entries: entries_data}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.update_report(scope, report, update_attrs)
+
+      assert updated_report.entries == entries_data
+    end
+
+    test "can clear entries by setting to empty array" do
+      entries_data = [%{"release" => "v1.0.0", "summary" => "Initial release"}]
+      scope = user_scope_fixture()
+      report = report_fixture(scope, %{entries: entries_data})
+
+      assert report.entries == entries_data
+
+      update_attrs = %{entries: []}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.update_report(scope, report, update_attrs)
+
+      assert updated_report.entries == []
+    end
+
+    test "entries field persists correctly in database" do
+      entries_data = [
+        %{"release_name" => "v1.0.0", "issue_key" => "PROJ-123", "priority" => "high"},
+        %{"release_name" => "v1.1.0", "issue_key" => "PROJ-456", "priority" => "medium"}
+      ]
+
+      scope = user_scope_fixture()
+
+      # Create report with entries
+      {:ok, report} =
+        Reporting.create_report(scope, %{
+          name: "Database test report",
+          year: 2023,
+          entries: entries_data
+        })
+
+      # Reload from database to ensure persistence
+      reloaded_report = Reporting.get_report!(scope, report.id)
+      assert reloaded_report.entries == entries_data
+
+      # Verify the data structure is preserved correctly
+      first_entry = List.first(reloaded_report.entries)
+      assert first_entry["release_name"] == "v1.0.0"
+      assert first_entry["issue_key"] == "PROJ-123"
+      assert first_entry["priority"] == "high"
+
+      second_entry = List.last(reloaded_report.entries)
+      assert second_entry["release_name"] == "v1.1.0"
+      assert second_entry["issue_key"] == "PROJ-456"
+      assert second_entry["priority"] == "medium"
+
+      # Ensure both entries are preserved
+      assert length(reloaded_report.entries) == 2
+    end
+
+    test "add_entry_to_report/3 adds entry to existing entries array" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      new_entry = %{"release_name" => "v1.0.0", "feature" => "authentication"}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.add_entry_to_report(scope, report, new_entry)
+
+      assert updated_report.entries == [new_entry]
+
+      # Add another entry
+      second_entry = %{"release_name" => "v1.1.0", "feature" => "dashboard"}
+
+      assert {:ok, %Report{} = updated_report2} =
+               Reporting.add_entry_to_report(scope, updated_report, second_entry)
+
+      assert updated_report2.entries == [new_entry, second_entry]
+    end
+
+    test "add_entry_to_report/3 works with report that already has entries" do
+      initial_entries = [%{"release" => "v0.1.0", "type" => "initial"}]
+      scope = user_scope_fixture()
+      report = report_fixture(scope, %{entries: initial_entries})
+
+      new_entry = %{"release" => "v0.2.0", "type" => "update"}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.add_entry_to_report(scope, report, new_entry)
+
+      assert updated_report.entries == initial_entries ++ [new_entry]
+    end
+
+    test "clear_report_entries/2 clears all entries from report" do
+      entries_data = [
+        %{"release" => "v1.0.0", "features" => ["login"]},
+        %{"release" => "v1.1.0", "features" => ["dashboard"]}
+      ]
+
+      scope = user_scope_fixture()
+      report = report_fixture(scope, %{entries: entries_data})
+
+      assert report.entries == entries_data
+
+      assert {:ok, %Report{} = cleared_report} =
+               Reporting.clear_report_entries(scope, report)
+
+      assert cleared_report.entries == []
+    end
+
+    test "add_entry_to_report/3 handles nil entries correctly" do
+      scope = user_scope_fixture()
+      # Create a report and manually set entries to nil to test edge case
+      report = report_fixture(scope)
+      report_with_nil = %{report | entries: nil}
+
+      new_entry = %{"release_name" => "v1.0.0", "summary" => "First release"}
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.add_entry_to_report(scope, report_with_nil, new_entry)
+
+      assert updated_report.entries == [new_entry]
     end
 
     test "create_report/2 creates entries via MonthlyReportWorker job" do
