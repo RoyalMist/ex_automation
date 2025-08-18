@@ -22,7 +22,7 @@ config :ex_automation, Oban,
     {Oban.Plugins.Pruner, max_age: 600},
     {Oban.Plugins.Cron,
      crontab: [
-       {"@reboot", ExAutomation.Jobs.GitlabFetchReleasesWorker}
+       {"@reboot", ExAutomation.Jobs.Base.GitlabFetchReleasesWorker}
      ]}
   ]
 

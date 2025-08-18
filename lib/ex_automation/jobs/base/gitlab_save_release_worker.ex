@@ -1,4 +1,4 @@
-defmodule ExAutomation.Jobs.GitlabSaveReleaseWorker do
+defmodule ExAutomation.Jobs.Base.GitlabSaveReleaseWorker do
   use Oban.Worker, queue: :data, priority: 2, max_attempts: 1
   alias ExAutomation.Gitlab
 
@@ -16,7 +16,7 @@ defmodule ExAutomation.Jobs.GitlabSaveReleaseWorker do
         })
 
         %{"name" => release["name"]}
-        |> ExAutomation.Jobs.GitlabTagReleaseWorker.new()
+        |> ExAutomation.Jobs.Base.GitlabTagReleaseWorker.new()
         |> Oban.insert()
     end
   end

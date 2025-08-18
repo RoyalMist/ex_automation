@@ -1,4 +1,4 @@
-defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
+defmodule ExAutomation.Jobs.Base.GitlabTagReleaseWorker do
   use Oban.Worker, queue: :data, priority: 3, max_attempts: 2
   alias ExAutomation.Gitlab
 
@@ -13,7 +13,7 @@ defmodule ExAutomation.Jobs.GitlabTagReleaseWorker do
     Gitlab.update_release(release, %{tags: tags})
 
     for tag <- tags do
-      ExAutomation.Jobs.JiraFetchIssueWorker.find_ticket(tag, nil)
+      ExAutomation.Jobs.Base.JiraFetchIssueWorker.find_ticket(tag, nil)
     end
 
     :ok
