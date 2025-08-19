@@ -18,11 +18,36 @@ defmodule ExAutomationWeb.ReportLive.Index do
       <.table
         id="reports"
         rows={@streams.reports}
-        row_click={fn {_id, report} -> JS.navigate(~p"/reports/#{report}") end}
+        row_click={
+          fn {_id, report} ->
+            if report.completed, do: JS.navigate(~p"/reports/#{report}"), else: %JS{}
+          end
+        }
       >
-        <:col :let={{_id, report}} label="Name">{report.name}</:col>
-        <:col :let={{_id, report}} label="Year">{report.year}</:col>
-        <:col :let={{_id, report}} label="Completed">{if report.completed, do: "✓", else: "✗"}</:col>
+        <:col :let={{_id, report}} label="Name">
+          <span
+            data-completed={to_string(report.completed)}
+            class={if !report.completed, do: "opacity-60", else: ""}
+          >
+            {report.name}
+          </span>
+        </:col>
+        <:col :let={{_id, report}} label="Year">
+          <span
+            data-completed={to_string(report.completed)}
+            class={if !report.completed, do: "opacity-60", else: ""}
+          >
+            {report.year}
+          </span>
+        </:col>
+        <:col :let={{_id, report}} label="Completed">
+          <span
+            data-completed={to_string(report.completed)}
+            class={if !report.completed, do: "opacity-60", else: ""}
+          >
+            {if report.completed, do: "✓", else: "✗"}
+          </span>
+        </:col>
         <:action :let={{_id, report}}>
           <div class="sr-only">
             <.link navigate={~p"/reports/#{report}"}>Show</.link>

@@ -155,4 +155,85 @@ defmodule ExAutomationWeb.ReportLiveTest do
       refute html =~ "✓"
     end
   end
+
+  describe "Row clickability" do
+    test "completed reports have clickable rows", %{conn: conn, scope: scope} do
+      # Create a completed report
+      report = report_fixture(scope, %{name: "Completed Report", year: 2024})
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{completed: true})
+
+      {:ok, index_live, _html} = live(conn, ~p"/reports")
+
+      # Check that the cells have the correct data attributes for clickable state
+      assert has_element?(index_live, "#reports-#{report.id} span[data-completed='true']")
+      refute has_element?(index_live, "#reports-#{report.id} span[class*='opacity-60']")
+
+      # Click the first cell and verify it navigates to show page
+      assert {:ok, show_live, _html} =
+               index_live
+               |> element("#reports-#{report.id} td", "Completed Report")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/reports/#{report}")
+
+      assert render(show_live) =~ "Report #{report.id}"
+      assert render(show_live) =~ "Completed Report"
+    end
+
+    test "incomplete reports have non-clickable rows", %{conn: conn, scope: scope} do
+      # Create an incomplete report (default completed: false)
+      report = report_fixture(scope, %{name: "Incomplete Report", year: 2024})
+
+      {:ok, index_live, _html} = live(conn, ~p"/reports")
+
+      # Check that the cells have the correct data attributes for non-clickable state
+      assert has_element?(index_live, "#reports-#{report.id} span[data-completed='false']")
+      assert has_element?(index_live, "#reports-#{report.id} span[class*='opacity-60']")
+
+      # Try to click the first cell and verify it does NOT navigate (no JS action)
+      # Since incomplete reports have no phx-click, this should not perform any navigation
+      # We'll just verify that the row is properly styled and non-interactive
+      html = render(index_live)
+      assert html =~ "Listing Reports"
+      assert html =~ "Incomplete Report"
+
+      # Verify that the incomplete report cell doesn't have navigation action
+      # by checking that clicking it returns an empty JS command
+      assert_raise ArgumentError, ~r/no push or navigation command found/, fn ->
+        index_live
+        |> element("#reports-#{report.id} td", "Incomplete Report")
+        |> render_click()
+      end
+    end
+
+    test "mixed completion status shows appropriate styling", %{conn: conn, scope: scope} do
+      # Create one completed and one incomplete report
+      completed_report = report_fixture(scope, %{name: "Completed Report", year: 2024})
+
+      {:ok, completed_report} =
+        ExAutomation.Reporting.update_report(scope, completed_report, %{completed: true})
+
+      incomplete_report = report_fixture(scope, %{name: "Incomplete Report", year: 2024})
+
+      {:ok, index_live, _html} = live(conn, ~p"/reports")
+
+      # Check completed report styling - should have data-completed="true" and no opacity
+      assert has_element?(
+               index_live,
+               "#reports-#{completed_report.id} span[data-completed='true']"
+             )
+
+      refute has_element?(index_live, "#reports-#{completed_report.id} span[class*='opacity-60']")
+
+      # Check incomplete report styling - should have data-completed="false" and opacity
+      assert has_element?(
+               index_live,
+               "#reports-#{incomplete_report.id} span[data-completed='false']"
+             )
+
+      assert has_element?(
+               index_live,
+               "#reports-#{incomplete_report.id} span[class*='opacity-60']"
+             )
+    end
+  end
 end
