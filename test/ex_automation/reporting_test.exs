@@ -711,5 +711,75 @@ defmodule ExAutomation.ReportingTest do
       assert updated_report.complete == true
       assert updated_report.entries == []
     end
+
+    test "MonthlyReportWorker finds initiative as grand parent in three-level hierarchy" do
+      import ExAutomation.JiraFixtures
+      valid_attrs = %{name: "three-level hierarchy report", year: 2024}
+      scope = user_scope_fixture()
+
+      # Create test Jira issues with three-level hierarchy
+      grand_parent_issue =
+        issue_fixture(%{
+          key: "INIT-100",
+          summary: "Main Initiative",
+          type: "Initiative",
+          status: "In Progress"
+        })
+
+      parent_issue =
+        issue_fixture(%{
+          key: "EPIC-200",
+          summary: "Feature Epic",
+          type: "Epic",
+          status: "In Progress",
+          parent_id: grand_parent_issue.id
+        })
+
+      child_issue =
+        issue_fixture(%{
+          key: "TASK-300",
+          summary: "Implementation Task",
+          type: "Task",
+          status: "Done",
+          parent_id: parent_issue.id
+        })
+
+      # Create release with the child issue as tag
+      _release_with_child_tag =
+        ExAutomation.GitlabFixtures.release_fixture(%{
+          name: "v2.0.0",
+          date: ~N[2024-08-15 10:00:00],
+          description: "Feature release with child task",
+          tags: [child_issue.key]
+        })
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+
+      # Process the job that creates entries
+      perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
+        "report_id" => report.id,
+        "user_id" => scope.user.id,
+        "year" => report.year
+      })
+
+      # Get the updated report
+      updated_report = Reporting.get_report!(scope, report.id)
+      assert length(updated_report.entries) == 1
+      assert updated_report.complete == true
+
+      # Find the entry for our release
+      entry = Enum.find(updated_report.entries, &(&1["release_name"] == "v2.0.0"))
+      assert entry != nil
+
+      # Verify the entry has the child issue details
+      assert entry["issue_key"] == child_issue.key
+      assert entry["issue_summary"] == child_issue.summary
+      assert entry["issue_type"] == child_issue.type
+      assert entry["issue_status"] == child_issue.status
+
+      # Most importantly, verify the initiative is the grand parent (top-level)
+      assert entry["initiative_key"] == grand_parent_issue.key
+      assert entry["initiative_summary"] == grand_parent_issue.summary
+    end
   end
 end
