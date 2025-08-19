@@ -258,7 +258,7 @@ defmodule ExAutomation.ReportingTest do
       new_entry = %{"release" => "v0.2.0", "type" => "update"}
 
       assert {:ok, %Report{} = updated_report} =
-               Reporting.add_entry_to_report(scope, report, new_entry)
+               Reporting.add_entry_to_report(scope, report.id, new_entry)
 
       assert updated_report.entries == initial_entries ++ [new_entry]
     end
@@ -289,7 +289,7 @@ defmodule ExAutomation.ReportingTest do
       new_entry = %{"release_name" => "v1.0.0", "summary" => "First release"}
 
       assert {:ok, %Report{} = updated_report} =
-               Reporting.add_entry_to_report(scope, report_with_nil, new_entry)
+               Reporting.add_entry_to_report(scope, report_with_nil.id, new_entry)
 
       assert updated_report.entries == [new_entry]
     end
