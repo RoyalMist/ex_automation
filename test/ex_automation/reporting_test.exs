@@ -68,7 +68,7 @@ defmodule ExAutomation.ReportingTest do
       assert report.complete == false
     end
 
-    test "create_report/2 with complete field set to true creates a completed report" do
+    test "create_report/2 ignores complete field during creation" do
       valid_attrs = %{name: "completed report", year: 2023, complete: true}
       scope = user_scope_fixture()
 
@@ -77,7 +77,49 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 2023
       assert report.user_id == scope.user.id
       assert report.entries == []
-      assert report.complete == true
+      # Complete field should be false despite being set to true in attrs
+      assert report.complete == false
+    end
+
+    test "create_changeset/3 does not allow setting complete field" do
+      scope = user_scope_fixture()
+      attrs = %{name: "test report", year: 2023, complete: true, entries: []}
+
+      changeset =
+        ExAutomation.Reporting.Report.create_changeset(
+          %ExAutomation.Reporting.Report{},
+          attrs,
+          scope
+        )
+
+      assert changeset.valid?
+      assert changeset.changes.name == "test report"
+      assert changeset.changes.year == 2023
+      # Entries field should not be in changes when empty array is provided (default value)
+      refute Map.has_key?(changeset.changes, :entries)
+      # Complete field should not be in changes
+      refute Map.has_key?(changeset.changes, :complete)
+      assert changeset.changes.user_id == scope.user.id
+    end
+
+    test "changeset/3 allows setting complete field for updates" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+      attrs = %{name: "updated report", year: 2024, complete: true}
+
+      changeset =
+        ExAutomation.Reporting.Report.changeset(
+          report,
+          attrs,
+          scope
+        )
+
+      assert changeset.valid?
+      assert changeset.changes.name == "updated report"
+      assert changeset.changes.year == 2024
+      assert changeset.changes.complete == true
+      # user_id should not change during updates
+      refute Map.has_key?(changeset.changes, :user_id)
     end
 
     test "update_report/3 can update entries" do

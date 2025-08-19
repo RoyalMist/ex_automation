@@ -16,7 +16,7 @@ defmodule ExAutomationWeb.ReportLive.Form do
       <.form for={@form} id="report-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:year]} type="number" label="Year" />
-        <.input field={@form[:complete]} type="checkbox" label="Complete" />
+
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Report</.button>
           <.button navigate={return_path(@current_scope, @return_to, @report)}>Cancel</.button>
@@ -43,13 +43,16 @@ defmodule ExAutomationWeb.ReportLive.Form do
     socket
     |> assign(:page_title, "New Report")
     |> assign(:report, report)
-    |> assign(:form, to_form(Report.changeset(%Report{}, %{}, socket.assigns.current_scope)))
+    |> assign(
+      :form,
+      to_form(Report.create_changeset(%Report{}, %{}, socket.assigns.current_scope))
+    )
   end
 
   @impl true
   def handle_event("validate", %{"report" => report_params}, socket) do
     changeset =
-      Report.changeset(socket.assigns.report, report_params, socket.assigns.current_scope)
+      Report.create_changeset(socket.assigns.report, report_params, socket.assigns.current_scope)
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end

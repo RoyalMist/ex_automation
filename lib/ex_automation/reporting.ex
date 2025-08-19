@@ -73,7 +73,7 @@ defmodule ExAutomation.Reporting do
   def create_report(%Scope{} = scope, attrs) do
     with {:ok, report = %Report{}} <-
            %Report{}
-           |> Report.changeset(attrs, scope)
+           |> Report.create_changeset(attrs, scope)
            |> Repo.insert() do
       broadcast_reports(scope, {:created, report})
 
