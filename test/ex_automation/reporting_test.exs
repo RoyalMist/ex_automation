@@ -234,11 +234,10 @@ defmodule ExAutomation.ReportingTest do
     test "add_entry_to_report/3 adds entry to existing entries array" do
       scope = user_scope_fixture()
       report = report_fixture(scope)
-
       new_entry = %{"release_name" => "v1.0.0", "feature" => "authentication"}
 
       assert {:ok, %Report{} = updated_report} =
-               Reporting.add_entry_to_report(scope, report, new_entry)
+               Reporting.add_entry_to_report(scope, report.id, new_entry)
 
       assert updated_report.entries == [new_entry]
 
@@ -246,7 +245,7 @@ defmodule ExAutomation.ReportingTest do
       second_entry = %{"release_name" => "v1.1.0", "feature" => "dashboard"}
 
       assert {:ok, %Report{} = updated_report2} =
-               Reporting.add_entry_to_report(scope, updated_report, second_entry)
+               Reporting.add_entry_to_report(scope, updated_report.id, second_entry)
 
       assert updated_report2.entries == [new_entry, second_entry]
     end
@@ -355,7 +354,6 @@ defmodule ExAutomation.ReportingTest do
 
     test "MonthlyReportWorker processes releases with tags and creates Jira-enriched entries" do
       import ExAutomation.JiraFixtures
-
       valid_attrs = %{name: "tagged releases report", year: 2024}
       scope = user_scope_fixture()
 
@@ -385,7 +383,7 @@ defmodule ExAutomation.ReportingTest do
           description: "Basic release"
         })
 
-      release_with_tags =
+      _release_with_tags =
         ExAutomation.GitlabFixtures.release_fixture(%{
           name: "v1.1.0",
           date: ~N[2024-06-15 10:00:00],
@@ -398,7 +396,8 @@ defmodule ExAutomation.ReportingTest do
       # Process the main job that creates basic entries
       perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
         "report_id" => report.id,
-        "user_id" => scope.user.id
+        "user_id" => scope.user.id,
+        "year" => report.year
       })
 
       # Should have 2 basic entries (one for each release)
@@ -410,24 +409,12 @@ defmodule ExAutomation.ReportingTest do
         Enum.find(report_after_basic.entries, &(&1["release_name"] == "v1.1.0"))
 
       assert tagged_release_entry != nil
-      # Should be nil initially
-      assert tagged_release_entry["issue_key"] == nil
-
-      # Process the tag-specific job for the tagged release
-      for tag <- release_with_tags.tags do
-        perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
-          "user_id" => scope.user.id,
-          "report_id" => report.id,
-          "release_name" => release_with_tags.name,
-          "release_date" => NaiveDateTime.to_iso8601(release_with_tags.date),
-          "tag" => tag
-        })
-      end
+      assert tagged_release_entry["issue_key"] == "TASK-456"
 
       # Final entry count after processing tags
       report_final = Reporting.get_report!(scope, report.id)
       # Should have 2 basic entries + 1 enriched entry per tag
-      assert length(report_final.entries) == 3
+      assert length(report_final.entries) == 2
 
       # Find the Jira-enriched entry
       enriched_entry =
@@ -445,13 +432,12 @@ defmodule ExAutomation.ReportingTest do
 
       # Verify we have both basic and enriched entries for the same release
       v110_entries = Enum.filter(report_final.entries, &(&1["release_name"] == "v1.1.0"))
-      assert Enum.count(v110_entries) == 2
+      assert Enum.count(v110_entries) == 1
 
       basic_entry = Enum.find(v110_entries, &(&1["issue_key"] == nil))
       enriched_entry = Enum.find(v110_entries, &(&1["issue_key"] != nil))
-
-      assert basic_entry != nil
-      assert enriched_entry != nil
+      refute basic_entry
+      assert enriched_entry
     end
 
     test "MonthlyReportWorker handles releases with multiple tags and issues without parents" do

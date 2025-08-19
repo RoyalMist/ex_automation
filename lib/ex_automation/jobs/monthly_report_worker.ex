@@ -6,22 +6,20 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
   alias ExAutomation.Jira.Issue
   alias ExAutomation.Reporting
 
-  require Logger
-
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"user_id" => user_id, "report_id" => report_id}}) do
+  def perform(%Oban.Job{args: %{"user_id" => user_id, "report_id" => report_id, "year" => year}}) do
     scope = Scope.for_user(%User{id: user_id})
-    report = Reporting.get_report!(scope, report_id)
-    releases = ExAutomation.Gitlab.list_releases_by_year(report.year)
-    current_report = Reporting.get_report!(scope, report_id)
+    releases = ExAutomation.Gitlab.list_releases_by_year(year)
 
     for release <- releases do
       case release.tags do
         [] ->
-          Reporting.add_entry_to_report(scope, current_report, %{
+          entry = %{
             "release_name" => release.name,
             "release_date" => NaiveDateTime.to_iso8601(release.date)
-          })
+          }
+
+          Reporting.add_entry_to_report(scope, report_id, entry)
 
         tags ->
           for tag <- tags do
@@ -32,7 +30,7 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
                 tag: tag
               )
 
-            Reporting.add_entry_to_report(scope, current_report, entry)
+            Reporting.add_entry_to_report(scope, report_id, entry)
           end
       end
     end

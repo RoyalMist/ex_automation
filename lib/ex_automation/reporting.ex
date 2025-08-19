@@ -77,7 +77,7 @@ defmodule ExAutomation.Reporting do
            |> Repo.insert() do
       broadcast_reports(scope, {:created, report})
 
-      %{user_id: scope.user.id, report_id: report.id}
+      %{user_id: scope.user.id, report_id: report.id, year: report.year}
       |> ExAutomation.Jobs.MonthlyReportWorker.new()
       |> Oban.insert()
 
@@ -114,8 +114,8 @@ defmodule ExAutomation.Reporting do
       {:ok, %Report{}}
 
   """
-  def add_entry_to_report(%Scope{} = scope, %Report{} = report, entry) when is_map(entry) do
-    true = report.user_id == scope.user.id
+  def add_entry_to_report(%Scope{} = scope, report_id, entry) when is_map(entry) do
+    report = get_report!(scope, report_id)
     current_entries = report.entries || []
     new_entries = current_entries ++ [entry]
     update_report(scope, report, %{entries: new_entries})
