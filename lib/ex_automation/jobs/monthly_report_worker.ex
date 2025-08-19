@@ -68,7 +68,7 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
       }
     rescue
       e ->
-        Logger.error("impossible to create entry with #{inspect(e)}")
+        Logger.info("impossible to create entry with #{inspect(e)}")
         nil
     end
   end
