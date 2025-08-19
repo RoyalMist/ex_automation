@@ -35,6 +35,9 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
       end
     end
 
+    # Mark the report as complete
+    Reporting.mark_report_complete(scope, report_id)
+
     :ok
   end
 

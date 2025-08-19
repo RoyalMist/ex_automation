@@ -135,6 +135,24 @@ defmodule ExAutomation.Reporting do
   end
 
   @doc """
+  Marks a report as complete.
+
+  ## Examples
+
+      iex> mark_report_complete(scope, report)
+      {:ok, %Report{}}
+
+  """
+  def mark_report_complete(%Scope{} = scope, %Report{} = report) do
+    update_report(scope, report, %{complete: true})
+  end
+
+  def mark_report_complete(%Scope{} = scope, report_id) when is_integer(report_id) do
+    report = get_report!(scope, report_id)
+    mark_report_complete(scope, report)
+  end
+
+  @doc """
   Deletes a Report.
 
   ## Examples

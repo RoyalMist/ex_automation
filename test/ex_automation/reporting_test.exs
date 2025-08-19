@@ -325,6 +325,7 @@ defmodule ExAutomation.ReportingTest do
       # Verify entries were added to the report
       updated_report = Reporting.get_report!(scope, report.id)
       assert length(updated_report.entries) == 2
+      assert updated_report.complete == true
 
       # Verify entries have correct release names
       entry_names = Enum.map(updated_report.entries, & &1["release_name"])
@@ -352,6 +353,7 @@ defmodule ExAutomation.ReportingTest do
       # Verify no entries were added to the report since no releases exist for 2020
       updated_report = Reporting.get_report!(scope, report.id)
       assert updated_report.entries == []
+      assert updated_report.complete == true
     end
 
     test "MonthlyReportWorker processes releases with tags and creates Jira-enriched entries" do
@@ -437,9 +439,11 @@ defmodule ExAutomation.ReportingTest do
       assert Enum.count(v110_entries) == 1
 
       basic_entry = Enum.find(v110_entries, &(&1["issue_key"] == nil))
-      enriched_entry = Enum.find(v110_entries, &(&1["issue_key"] != nil))
+      _enriched_entry = Enum.find(v110_entries, &(&1["issue_key"] != nil))
       refute basic_entry
-      assert enriched_entry
+
+      # Verify the report is marked as complete
+      assert report_final.complete == true
     end
 
     test "MonthlyReportWorker handles releases with multiple tags and issues without parents" do
@@ -518,9 +522,11 @@ defmodule ExAutomation.ReportingTest do
       assert child_entry["issue_summary"] == child_issue.summary
       assert child_entry["issue_type"] == child_issue.type
       assert child_entry["issue_status"] == child_issue.status
-      # Initiative should be parent
       assert child_entry["initiative_key"] == parent_issue.key
       assert child_entry["initiative_summary"] == parent_issue.summary
+
+      # Verify the report is marked as complete
+      assert report_final.complete == true
     end
 
     test "MonthlyReportWorker automatically processes tags and enqueues Jira integration jobs" do
@@ -600,6 +606,110 @@ defmodule ExAutomation.ReportingTest do
       other_scope = user_scope_fixture()
       report = report_fixture(scope)
       assert_raise MatchError, fn -> Reporting.delete_report(other_scope, report) end
+    end
+
+    test "mark_report_complete/2 with report struct marks report as complete" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      # Initially complete should be false
+      assert report.complete == false
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.mark_report_complete(scope, report)
+
+      assert updated_report.complete == true
+      assert updated_report.id == report.id
+    end
+
+    test "mark_report_complete/2 with report id marks report as complete" do
+      scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      # Initially complete should be false
+      assert report.complete == false
+
+      assert {:ok, %Report{} = updated_report} =
+               Reporting.mark_report_complete(scope, report.id)
+
+      assert updated_report.complete == true
+      assert updated_report.id == report.id
+    end
+
+    test "mark_report_complete/2 with invalid report id raises" do
+      scope = user_scope_fixture()
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Reporting.mark_report_complete(scope, 999_999)
+      end
+    end
+
+    test "mark_report_complete/2 with invalid scope raises" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      report = report_fixture(scope)
+
+      assert_raise MatchError, fn ->
+        Reporting.mark_report_complete(other_scope, report)
+      end
+    end
+
+    test "MonthlyReportWorker marks report as complete after processing" do
+      valid_attrs = %{name: "completion test report", year: 2024}
+      scope = user_scope_fixture()
+
+      # Create a test release
+      _release =
+        ExAutomation.GitlabFixtures.release_fixture(%{
+          name: "v1.0.0",
+          date: ~N[2024-01-15 10:00:00],
+          description: "Test release"
+        })
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+
+      # Initially complete should be false
+      assert report.complete == false
+
+      # Process the job that was enqueued
+      result =
+        perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
+          "report_id" => report.id,
+          "user_id" => scope.user.id,
+          "year" => report.year
+        })
+
+      assert result == :ok
+
+      # Verify the report is marked as complete after job processing
+      updated_report = Reporting.get_report!(scope, report.id)
+      assert updated_report.complete == true
+      assert length(updated_report.entries) == 1
+    end
+
+    test "MonthlyReportWorker marks report as complete even with no releases" do
+      valid_attrs = %{name: "empty completion test", year: 2020}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
+
+      # Initially complete should be false
+      assert report.complete == false
+
+      # Process the job that was enqueued (no releases for 2020)
+      result =
+        perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
+          "report_id" => report.id,
+          "user_id" => scope.user.id,
+          "year" => report.year
+        })
+
+      assert result == :ok
+
+      # Verify the report is marked as complete even with no entries
+      updated_report = Reporting.get_report!(scope, report.id)
+      assert updated_report.complete == true
+      assert updated_report.entries == []
     end
   end
 end
