@@ -348,7 +348,7 @@ defmodule ExAutomation.ReportingTest do
         })
 
       # Job should complete successfully even with no releases
-      assert result == :ok
+      {:ok, _} = result
 
       # Verify no entries were added to the report since no releases exist for 2020
       updated_report = Reporting.get_report!(scope, report.id)
@@ -679,7 +679,7 @@ defmodule ExAutomation.ReportingTest do
           "year" => report.year
         })
 
-      assert result == :ok
+      {:ok, _} = result
 
       # Verify the report is marked as complete after job processing
       updated_report = Reporting.get_report!(scope, report.id)
@@ -704,7 +704,7 @@ defmodule ExAutomation.ReportingTest do
           "year" => report.year
         })
 
-      assert result == :ok
+      {:ok, _} = result
 
       # Verify the report is marked as complete even with no entries
       updated_report = Reporting.get_report!(scope, report.id)
