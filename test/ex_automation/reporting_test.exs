@@ -318,7 +318,8 @@ defmodule ExAutomation.ReportingTest do
       # Process the job that was enqueued
       perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
         "report_id" => report.id,
-        "user_id" => scope.user.id
+        "user_id" => scope.user.id,
+        "year" => report.year
       })
 
       # Verify entries were added to the report
@@ -341,7 +342,8 @@ defmodule ExAutomation.ReportingTest do
       result =
         perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
           "report_id" => report.id,
-          "user_id" => scope.user.id
+          "user_id" => scope.user.id,
+          "year" => report.year
         })
 
       # Job should complete successfully even with no releases
@@ -442,7 +444,6 @@ defmodule ExAutomation.ReportingTest do
 
     test "MonthlyReportWorker handles releases with multiple tags and issues without parents" do
       import ExAutomation.JiraFixtures
-
       valid_attrs = %{name: "multi-tag report", year: 2024}
       scope = user_scope_fixture()
 
@@ -474,7 +475,7 @@ defmodule ExAutomation.ReportingTest do
         })
 
       # Create release with multiple tags
-      release_multi_tags =
+      _release_multi_tags =
         ExAutomation.GitlabFixtures.release_fixture(%{
           name: "v2.0.0",
           date: ~N[2024-12-15 10:00:00],
@@ -487,35 +488,17 @@ defmodule ExAutomation.ReportingTest do
       # Process the main job that creates basic entries
       perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
         "report_id" => report.id,
-        "user_id" => scope.user.id
+        "user_id" => scope.user.id,
+        "year" => report.year
       })
-
-      # Should have 1 basic entry
-      report_after_basic = Reporting.get_report!(scope, report.id)
-      assert length(report_after_basic.entries) == 1
-
-      # Process the tag-specific jobs for the release with multiple tags
-      for tag <- release_multi_tags.tags do
-        perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
-          "user_id" => scope.user.id,
-          "report_id" => report.id,
-          "release_name" => release_multi_tags.name,
-          "release_date" => NaiveDateTime.to_iso8601(release_multi_tags.date),
-          "tag" => tag
-        })
-      end
 
       # Final entry count: 1 basic + 2 enriched (one for each tag)
       report_final = Reporting.get_report!(scope, report.id)
-      assert length(report_final.entries) == 3
+      assert length(report_final.entries) == 2
 
       # Find entries for the release with multiple tags
       v200_entries = Enum.filter(report_final.entries, &(&1["release_name"] == "v2.0.0"))
-      assert Enum.count(v200_entries) == 3
-
-      # Verify basic entry
-      basic_entry = Enum.find(v200_entries, &(&1["issue_key"] == nil))
-      assert basic_entry != nil
+      assert Enum.count(v200_entries) == 2
 
       # Verify standalone issue entry (no parent, so initiative should be same as issue)
       standalone_entry = Enum.find(v200_entries, &(&1["issue_key"] == standalone_issue.key))
@@ -525,8 +508,8 @@ defmodule ExAutomation.ReportingTest do
       assert standalone_entry["issue_type"] == standalone_issue.type
       assert standalone_entry["issue_status"] == standalone_issue.status
       # Initiative should be empty since it's the same as the issue
-      assert standalone_entry["initiative_key"] == ""
-      assert standalone_entry["initiative_summary"] == ""
+      assert standalone_entry["initiative_key"] == "N/A"
+      assert standalone_entry["initiative_summary"] == "N/A"
 
       # Verify child issue entry (has parent, so initiative should be parent)
       child_entry = Enum.find(v200_entries, &(&1["issue_key"] == child_issue.key))
