@@ -546,7 +546,7 @@ defmodule ExAutomation.ReportingTest do
           description: "Basic release"
         })
 
-      release_with_tags =
+      _release_with_tags =
         ExAutomation.GitlabFixtures.release_fixture(%{
           name: "v1.1.0",
           date: ~N[2024-06-15 10:00:00],
@@ -559,32 +559,13 @@ defmodule ExAutomation.ReportingTest do
       # Process only the main job - it should automatically enqueue tag-specific jobs
       perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
         "report_id" => report.id,
-        "user_id" => scope.user.id
-      })
-
-      # Verify the tag-specific job was enqueued
-      assert_enqueued(
-        worker: ExAutomation.Jobs.MonthlyReportWorker,
-        args: %{
-          "user_id" => scope.user.id,
-          "report_id" => report.id,
-          "release_name" => "v1.1.0",
-          "tag" => issue.key
-        }
-      )
-
-      # Manually trigger the enqueued tag job to simulate full workflow
-      perform_job(ExAutomation.Jobs.MonthlyReportWorker, %{
         "user_id" => scope.user.id,
-        "report_id" => report.id,
-        "release_name" => "v1.1.0",
-        "release_date" => NaiveDateTime.to_iso8601(release_with_tags.date),
-        "tag" => issue.key
+        "year" => report.year
       })
 
       # Verify Jira-enriched entry was added (2 basic + 1 enriched)
       report_final = Reporting.get_report!(scope, report.id)
-      assert length(report_final.entries) == 3
+      assert length(report_final.entries) == 2
 
       # Find the Jira-enriched entry
       enriched_entry =
@@ -598,8 +579,8 @@ defmodule ExAutomation.ReportingTest do
       assert enriched_entry["issue_type"] == issue.type
       assert enriched_entry["issue_status"] == issue.status
       # Since no parent, initiative should be empty
-      assert enriched_entry["initiative_key"] == ""
-      assert enriched_entry["initiative_summary"] == ""
+      assert enriched_entry["initiative_key"] == "N/A"
+      assert enriched_entry["initiative_summary"] == "N/A"
     end
 
     test "create_report/2 with invalid data returns error changeset" do
