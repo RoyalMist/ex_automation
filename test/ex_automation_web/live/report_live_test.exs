@@ -68,6 +68,60 @@ defmodule ExAutomationWeb.ReportLiveTest do
       assert html =~ "Show Report"
       assert html =~ report.name
     end
+
+    test "displays formatted JSON when report has entries", %{conn: conn, scope: scope} do
+      # Create a report and then update it with entries (since create_changeset doesn't allow entries)
+      report = report_fixture(scope, %{name: "JSON Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "issue_key" => "TASK-123",
+          "issue_summary" => "Test task",
+          "issue_type" => "Task",
+          "issue_status" => "Done"
+        },
+        %{
+          "release_name" => "v2.0.0",
+          "issue_key" => "EPIC-456",
+          "issue_summary" => "Test epic",
+          "issue_type" => "Epic",
+          "issue_status" => "In Progress"
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, _show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      assert html =~ "Show Report"
+      assert html =~ "JSON Test Report"
+      assert html =~ "Entries Count"
+      assert html =~ "2"
+      assert html =~ "Report Data"
+      # Check that JSON is displayed with proper formatting
+      assert html =~ "release_name"
+      assert html =~ "v1.0.0"
+      assert html =~ "TASK-123"
+      assert html =~ "Test task"
+      # Check that copy button is present
+      assert html =~ "Copy JSON"
+    end
+
+    test "displays empty state when report has no entries", %{conn: conn, scope: scope} do
+      # Create a report without entries (default behavior)
+      report = report_fixture(scope, %{name: "Empty Report", year: 2024})
+
+      {:ok, _show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      assert html =~ "Show Report"
+      assert html =~ "Empty Report"
+      assert html =~ "Entries Count"
+      assert html =~ "0"
+      assert html =~ "Report Data"
+      assert html =~ "No entries available yet"
+      assert html =~ "Report may still be processing"
+    end
   end
 
   describe "New" do
