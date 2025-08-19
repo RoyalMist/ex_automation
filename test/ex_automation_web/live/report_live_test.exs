@@ -125,32 +125,32 @@ defmodule ExAutomationWeb.ReportLiveTest do
   end
 
   describe "New" do
-    test "does not show complete field in create form", %{conn: conn} do
+    test "does not show completed field in create form", %{conn: conn} do
       {:ok, form_live, html} = live(conn, ~p"/reports/new")
 
       assert html =~ "New Report"
       assert html =~ "Name"
       assert html =~ "Year"
-      # Complete field should not be present in the form
-      refute html =~ "Complete"
-      refute has_element?(form_live, "input[name='report[complete]']")
+      # Completed field should not be present in the form
+      refute html =~ "Completed"
+      refute has_element?(form_live, "input[name='report[completed]']")
     end
 
-    test "create form uses create_changeset which ignores complete field", %{conn: conn} do
+    test "create form uses create_changeset which ignores completed field", %{conn: conn} do
       {:ok, form_live, _html} = live(conn, ~p"/reports/new")
 
-      # Submit form normally (complete field can't be set from UI)
+      # Submit form normally (completed field can't be set from UI)
       assert {:ok, index_live, _html} =
                form_live
                |> form("#report-form", report: @create_attrs)
                |> render_submit()
                |> follow_redirect(conn, ~p"/reports")
 
-      # Verify report was created with complete = false (default value)
+      # Verify report was created with completed = false (default value)
       html = render(index_live)
       assert html =~ "Report created successfully"
       assert html =~ "some name"
-      # In the table, complete should show ✗ (false), not ✓ (true)
+      # In the table, completed should show ✗ (false), not ✓ (true)
       assert html =~ "✗"
       refute html =~ "✓"
     end

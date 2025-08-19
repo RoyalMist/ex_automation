@@ -38,7 +38,7 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 42
       assert report.user_id == scope.user.id
       assert report.entries == []
-      assert report.complete == false
+      assert report.completed == false
     end
 
     test "create_report/2 with entries creates a report with entries" do
@@ -55,7 +55,7 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 2023
       assert report.user_id == scope.user.id
       assert report.entries == entries_data
-      assert report.complete == false
+      assert report.completed == false
     end
 
     test "create_report/2 with invalid entries data fails validation gracefully" do
@@ -65,11 +65,11 @@ defmodule ExAutomation.ReportingTest do
 
       assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
       assert report.entries == []
-      assert report.complete == false
+      assert report.completed == false
     end
 
-    test "create_report/2 ignores complete field during creation" do
-      valid_attrs = %{name: "completed report", year: 2023, complete: true}
+    test "create_report/2 ignores completed field during creation" do
+      valid_attrs = %{name: "completed report", year: 2023, completed: true}
       scope = user_scope_fixture()
 
       assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
@@ -77,13 +77,13 @@ defmodule ExAutomation.ReportingTest do
       assert report.year == 2023
       assert report.user_id == scope.user.id
       assert report.entries == []
-      # Complete field should be false despite being set to true in attrs
-      assert report.complete == false
+      # Completed field should be false despite being set to true in attrs
+      assert report.completed == false
     end
 
-    test "create_changeset/3 does not allow setting complete field" do
+    test "create_changeset/3 does not allow setting completed field" do
       scope = user_scope_fixture()
-      attrs = %{name: "test report", year: 2023, complete: true, entries: []}
+      attrs = %{name: "test report", year: 2023, completed: true, entries: []}
 
       changeset =
         ExAutomation.Reporting.Report.create_changeset(
@@ -97,15 +97,15 @@ defmodule ExAutomation.ReportingTest do
       assert changeset.changes.year == 2023
       # Entries field should not be in changes when empty array is provided (default value)
       refute Map.has_key?(changeset.changes, :entries)
-      # Complete field should not be in changes
-      refute Map.has_key?(changeset.changes, :complete)
+      # Completed field should not be in changes
+      refute Map.has_key?(changeset.changes, :completed)
       assert changeset.changes.user_id == scope.user.id
     end
 
-    test "changeset/3 allows setting complete field for updates" do
+    test "changeset/3 allows setting completed field for updates" do
       scope = user_scope_fixture()
       report = report_fixture(scope)
-      attrs = %{name: "updated report", year: 2024, complete: true}
+      attrs = %{name: "updated report", year: 2024, completed: true}
 
       changeset =
         ExAutomation.Reporting.Report.changeset(
@@ -117,7 +117,7 @@ defmodule ExAutomation.ReportingTest do
       assert changeset.valid?
       assert changeset.changes.name == "updated report"
       assert changeset.changes.year == 2024
-      assert changeset.changes.complete == true
+      assert changeset.changes.completed == true
       # user_id should not change during updates
       refute Map.has_key?(changeset.changes, :user_id)
     end
@@ -138,27 +138,27 @@ defmodule ExAutomation.ReportingTest do
       assert updated_report.entries == new_entries
     end
 
-    test "update_report/3 can update complete field" do
+    test "update_report/3 can update completed field" do
       scope = user_scope_fixture()
       report = report_fixture(scope)
 
-      # Initially complete should be false
-      assert report.complete == false
+      # Initially completed should be false
+      assert report.completed == false
 
-      update_attrs = %{complete: true}
+      update_attrs = %{completed: true}
 
       assert {:ok, %Report{} = updated_report} =
                Reporting.update_report(scope, report, update_attrs)
 
-      assert updated_report.complete == true
+      assert updated_report.completed == true
 
       # Test updating back to false
-      update_attrs = %{complete: false}
+      update_attrs = %{completed: false}
 
       assert {:ok, %Report{} = updated_report} =
                Reporting.update_report(scope, report, update_attrs)
 
-      assert updated_report.complete == false
+      assert updated_report.completed == false
     end
 
     test "entries field accepts complex nested JSON structures" do
@@ -367,7 +367,7 @@ defmodule ExAutomation.ReportingTest do
       # Verify entries were added to the report
       updated_report = Reporting.get_report!(scope, report.id)
       assert length(updated_report.entries) == 2
-      assert updated_report.complete == true
+      assert updated_report.completed == true
 
       # Verify entries have correct release names
       entry_names = Enum.map(updated_report.entries, & &1["release_name"])
@@ -395,7 +395,7 @@ defmodule ExAutomation.ReportingTest do
       # Verify no entries were added to the report since no releases exist for 2020
       updated_report = Reporting.get_report!(scope, report.id)
       assert updated_report.entries == []
-      assert updated_report.complete == true
+      assert updated_report.completed == true
     end
 
     test "MonthlyReportWorker processes releases with tags and creates Jira-enriched entries" do
@@ -484,8 +484,8 @@ defmodule ExAutomation.ReportingTest do
       _enriched_entry = Enum.find(v110_entries, &(&1["issue_key"] != nil))
       refute basic_entry
 
-      # Verify the report is marked as complete
-      assert report_final.complete == true
+      # Verify the report is marked as completed
+      assert report_final.completed == true
     end
 
     test "MonthlyReportWorker handles releases with multiple tags and issues without parents" do
@@ -567,8 +567,8 @@ defmodule ExAutomation.ReportingTest do
       assert child_entry["initiative_key"] == parent_issue.key
       assert child_entry["initiative_summary"] == parent_issue.summary
 
-      # Verify the report is marked as complete
-      assert report_final.complete == true
+      # Verify the report is marked as completed
+      assert report_final.completed == true
     end
 
     test "MonthlyReportWorker automatically processes tags and enqueues Jira integration jobs" do
@@ -650,31 +650,31 @@ defmodule ExAutomation.ReportingTest do
       assert_raise MatchError, fn -> Reporting.delete_report(other_scope, report) end
     end
 
-    test "mark_report_complete/2 with report struct marks report as complete" do
+    test "mark_report_complete/2 with report struct marks report as completed" do
       scope = user_scope_fixture()
       report = report_fixture(scope)
 
-      # Initially complete should be false
-      assert report.complete == false
+      # Initially completed should be false
+      assert report.completed == false
 
       assert {:ok, %Report{} = updated_report} =
                Reporting.mark_report_complete(scope, report)
 
-      assert updated_report.complete == true
+      assert updated_report.completed == true
       assert updated_report.id == report.id
     end
 
-    test "mark_report_complete/2 with report id marks report as complete" do
+    test "mark_report_complete/2 with report id marks report as completed" do
       scope = user_scope_fixture()
       report = report_fixture(scope)
 
-      # Initially complete should be false
-      assert report.complete == false
+      # Initially completed should be false
+      assert report.completed == false
 
       assert {:ok, %Report{} = updated_report} =
                Reporting.mark_report_complete(scope, report.id)
 
-      assert updated_report.complete == true
+      assert updated_report.completed == true
       assert updated_report.id == report.id
     end
 
@@ -696,7 +696,7 @@ defmodule ExAutomation.ReportingTest do
       end
     end
 
-    test "MonthlyReportWorker marks report as complete after processing" do
+    test "MonthlyReportWorker marks report as completed after processing" do
       valid_attrs = %{name: "completion test report", year: 2024}
       scope = user_scope_fixture()
 
@@ -710,8 +710,8 @@ defmodule ExAutomation.ReportingTest do
 
       assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
 
-      # Initially complete should be false
-      assert report.complete == false
+      # Initially completed should be false
+      assert report.completed == false
 
       # Process the job that was enqueued
       result =
@@ -723,20 +723,20 @@ defmodule ExAutomation.ReportingTest do
 
       {:ok, _} = result
 
-      # Verify the report is marked as complete after job processing
+      # Verify the report is marked as completed after job processing
       updated_report = Reporting.get_report!(scope, report.id)
-      assert updated_report.complete == true
+      assert updated_report.completed == true
       assert length(updated_report.entries) == 1
     end
 
-    test "MonthlyReportWorker marks report as complete even with no releases" do
+    test "MonthlyReportWorker marks report as completed even with no releases" do
       valid_attrs = %{name: "empty completion test", year: 2020}
       scope = user_scope_fixture()
 
       assert {:ok, %Report{} = report} = Reporting.create_report(scope, valid_attrs)
 
-      # Initially complete should be false
-      assert report.complete == false
+      # Initially completed should be false
+      assert report.completed == false
 
       # Process the job that was enqueued (no releases for 2020)
       result =
@@ -748,9 +748,9 @@ defmodule ExAutomation.ReportingTest do
 
       {:ok, _} = result
 
-      # Verify the report is marked as complete even with no entries
+      # Verify the report is marked as completed even with no entries
       updated_report = Reporting.get_report!(scope, report.id)
-      assert updated_report.complete == true
+      assert updated_report.completed == true
       assert updated_report.entries == []
     end
 
@@ -807,7 +807,7 @@ defmodule ExAutomation.ReportingTest do
       # Get the updated report
       updated_report = Reporting.get_report!(scope, report.id)
       assert length(updated_report.entries) == 1
-      assert updated_report.complete == true
+      assert updated_report.completed == true
 
       # Find the entry for our release
       entry = Enum.find(updated_report.entries, &(&1["release_name"] == "v2.0.0"))
@@ -822,6 +822,9 @@ defmodule ExAutomation.ReportingTest do
       # Most importantly, verify the initiative is the grand parent (top-level)
       assert entry["initiative_key"] == grand_parent_issue.key
       assert entry["initiative_summary"] == grand_parent_issue.summary
+
+      # Verify the report is marked as completed
+      assert updated_report.completed == true
     end
   end
 end

@@ -20,7 +20,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       <.list>
         <:item title="Name">{@report.name}</:item>
         <:item title="Year">{@report.year}</:item>
-        <:item title="Complete">{if @report.complete, do: "Yes", else: "No"}</:item>
+        <:item title="Completed">{if @report.completed, do: "Yes", else: "No"}</:item>
         <:item title="Entries Count">{length(@report.entries)}</:item>
         <:item title="Created">
           {Calendar.strftime(@report.inserted_at, "%B %d, %Y at %I:%M %p")}

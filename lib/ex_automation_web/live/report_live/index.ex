@@ -22,7 +22,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
       >
         <:col :let={{_id, report}} label="Name">{report.name}</:col>
         <:col :let={{_id, report}} label="Year">{report.year}</:col>
-        <:col :let={{_id, report}} label="Complete">{if report.complete, do: "✓", else: "✗"}</:col>
+        <:col :let={{_id, report}} label="Completed">{if report.completed, do: "✓", else: "✗"}</:col>
         <:action :let={{_id, report}}>
           <div class="sr-only">
             <.link navigate={~p"/reports/#{report}"}>Show</.link>
@@ -62,7 +62,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
 
   @impl true
   def handle_info({type, %ExAutomation.Reporting.Report{}}, socket)
-      when type in [:created, :deleted] do
+      when type in [:created, :updated, :deleted] do
     {:noreply,
      stream(socket, :reports, Reporting.list_reports(socket.assigns.current_scope), reset: true)}
   end

@@ -135,7 +135,7 @@ defmodule ExAutomation.Reporting do
   end
 
   @doc """
-  Marks a report as complete.
+  Marks a report as completed.
 
   ## Examples
 
@@ -144,7 +144,14 @@ defmodule ExAutomation.Reporting do
 
   """
   def mark_report_complete(%Scope{} = scope, %Report{} = report) do
-    update_report(scope, report, %{complete: true})
+    case update_report(scope, report, %{completed: true}) do
+      res = {:ok, report} ->
+        broadcast_reports(scope, {:updated, report})
+        res
+
+      res ->
+        res
+    end
   end
 
   def mark_report_complete(%Scope{} = scope, report_id) when is_integer(report_id) do

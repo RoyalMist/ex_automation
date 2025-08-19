@@ -25,9 +25,9 @@ defmodule ExAutomation.Reporting.Report do
         }
       ]
 
-  ## Complete Field
+  ## Completed Field
 
-  The `complete` field indicates whether a report has finished processing:
+  The `completed` field indicates whether a report has finished processing:
   - Defaults to `false` when a report is created
   - Cannot be set to `true` during creation (use `create_changeset/3`)
   - Can be updated to `true` after creation (use `changeset/3`)
@@ -42,7 +42,7 @@ defmodule ExAutomation.Reporting.Report do
     field :year, :integer
     field :user_id, :id
     field :entries, {:array, :map}, default: []
-    field :complete, :boolean, default: false
+    field :completed, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -50,7 +50,7 @@ defmodule ExAutomation.Reporting.Report do
   @doc """
   Changeset for creating a new report.
 
-  The complete field is not allowed during creation as it should only be set
+  The completed field is not allowed during creation as it should only be set
   programmatically when a report processing job finishes.
   """
   def create_changeset(report, attrs, user_scope) do
@@ -63,11 +63,11 @@ defmodule ExAutomation.Reporting.Report do
   @doc """
   Changeset for updating an existing report.
 
-  Allows updating all fields including the complete field.
+  Allows updating all fields including the completed field.
   """
   def changeset(report, attrs, user_scope) do
     report
-    |> cast(attrs, [:name, :year, :entries, :complete])
+    |> cast(attrs, [:name, :year, :entries, :completed])
     |> validate_required([:name, :year])
     |> put_change(:user_id, user_scope.user.id)
   end
