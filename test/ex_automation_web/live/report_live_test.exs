@@ -65,11 +65,11 @@ defmodule ExAutomationWeb.ReportLiveTest do
     test "displays report", %{conn: conn, report: report} do
       {:ok, _show_live, html} = live(conn, ~p"/reports/#{report}")
 
-      assert html =~ "Show Report"
+      assert html =~ "Report #{report.id}"
       assert html =~ report.name
     end
 
-    test "displays formatted JSON when report has entries", %{conn: conn, scope: scope} do
+    test "displays foldable JSON when report has entries", %{conn: conn, scope: scope} do
       # Create a report and then update it with entries (since create_changeset doesn't allow entries)
       report = report_fixture(scope, %{name: "JSON Test Report", year: 2024})
 
@@ -92,19 +92,17 @@ defmodule ExAutomationWeb.ReportLiveTest do
 
       {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
 
-      {:ok, _show_live, html} = live(conn, ~p"/reports/#{report}")
+      {:ok, show_live, html} = live(conn, ~p"/reports/#{report}")
 
-      assert html =~ "Show Report"
+      assert html =~ "Report #{report.id}"
       assert html =~ "JSON Test Report"
       assert html =~ "Entries Count"
       assert html =~ "2"
       assert html =~ "Report Data"
-      # Check that JSON is displayed with proper formatting
-      assert html =~ "release_name"
-      assert html =~ "v1.0.0"
-      assert html =~ "TASK-123"
-      assert html =~ "Test task"
-      # Check that copy button is present
+      # Check that foldable JSON viewer is present
+      assert html =~ "Expand All"
+      assert html =~ "Foldable JSON viewer"
+      assert has_element?(show_live, "#json-viewer")
       assert html =~ "Copy JSON"
     end
 
@@ -234,6 +232,130 @@ defmodule ExAutomationWeb.ReportLiveTest do
                index_live,
                "#reports-#{incomplete_report.id} span[class*='opacity-60']"
              )
+    end
+  end
+
+  describe "Foldable JSON viewer" do
+    test "displays foldable JSON controls when report has entries", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "JSON Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "issue_key" => "TASK-123",
+          "issue_summary" => "Test task",
+          "issue_type" => "Task",
+          "issue_status" => "Done"
+        },
+        %{
+          "release_name" => "v2.0.0",
+          "issue_key" => "EPIC-456",
+          "issue_summary" => "Test epic",
+          "issue_type" => "Epic",
+          "issue_status" => "In Progress"
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      # Check that foldable JSON controls are present
+      assert html =~ "Expand All"
+      assert html =~ "Copy JSON"
+      assert html =~ "Foldable JSON viewer"
+
+      # Check that JSON viewer container is present
+      assert has_element?(show_live, "#json-viewer")
+    end
+
+    test "toggle expand/collapse all functionality", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "JSON Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "issues" => [
+            %{"key" => "TASK-123", "summary" => "Test task"}
+          ]
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, show_live, _html} = live(conn, ~p"/reports/#{report}")
+
+      # Initially should show "Expand All"
+      assert has_element?(show_live, "button", "Expand All")
+
+      # Click expand all
+      show_live
+      |> element("button", "Expand All")
+      |> render_click()
+
+      # Should now show "Collapse All"
+      assert has_element?(show_live, "button", "Collapse All")
+
+      # Click collapse all
+      show_live
+      |> element("button", "Collapse All")
+      |> render_click()
+
+      # Should show "Expand All" again
+      assert has_element?(show_live, "button", "Expand All")
+    end
+
+    test "individual node folding functionality", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "JSON Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "issues" => [
+            %{"key" => "TASK-123", "summary" => "Test task"}
+          ]
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, show_live, _html} = live(conn, ~p"/reports/#{report}")
+
+      # Initially should be collapsed, showing [+] button for root
+      assert has_element?(show_live, "button", "[+]")
+      refute has_element?(show_live, "button", "[-]")
+
+      # Expand the root array
+      show_live
+      |> element("button[phx-value-path='root']", "[+]")
+      |> render_click()
+
+      # Now should have both [+] and [-] buttons (root is expanded, children are collapsed)
+      assert has_element?(show_live, "button", "[-]")
+      assert has_element?(show_live, "button", "[+]")
+
+      # Collapse the root again
+      show_live
+      |> element("button[phx-value-path='root']", "[-]")
+      |> render_click()
+
+      # Should be back to initial state
+      assert has_element?(show_live, "button", "[+]")
+      refute has_element?(show_live, "button", "[-]")
+    end
+
+    test "does not show foldable JSON when report has no entries", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "Empty Report", year: 2024})
+
+      {:ok, _show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      # Should not show JSON viewer controls
+      refute html =~ "Expand All"
+      refute html =~ "Foldable JSON viewer"
+
+      # Should show empty state instead
+      assert html =~ "No entries available yet"
+      assert html =~ "Report may still be processing"
     end
   end
 end
