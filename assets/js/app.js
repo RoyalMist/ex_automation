@@ -74,6 +74,24 @@ window.addEventListener("phx:copy_to_clipboard", (event) => {
   }
 });
 
+// Add CSV download functionality
+window.addEventListener("phx:download_csv", (event) => {
+  const { content, filename } = event.detail;
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+});
+
 // The lines below enable quality of life phoenix_live_reload
 // development features:
 //

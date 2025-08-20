@@ -120,6 +120,82 @@ defmodule ExAutomationWeb.ReportLiveTest do
       assert html =~ "No entries available yet"
       assert html =~ "Report may still be processing"
     end
+
+    test "shows CSV download button when report has entries", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "CSV Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "release_date" => "2024-01-15T10:00:00",
+          "issue_key" => "TASK-123",
+          "issue_summary" => "Test task",
+          "issue_type" => "Task",
+          "issue_status" => "Done",
+          "initiative_key" => "EPIC-456",
+          "initiative_summary" => "Test epic"
+        },
+        %{
+          "release_name" => "v2.0.0",
+          "release_date" => "2024-02-15T10:00:00",
+          "issue_key" => "STORY-789",
+          "issue_summary" => "Test story",
+          "issue_type" => "Story",
+          "issue_status" => "In Progress",
+          "initiative_key" => "N/A",
+          "initiative_summary" => "N/A"
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      # Check that CSV download button is present
+      assert html =~ "Download CSV"
+      assert has_element?(show_live, "button[phx-click='download_csv']")
+    end
+
+    test "CSV download button shows success message", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "CSV Test Report", year: 2024})
+
+      entries = [
+        %{
+          "release_name" => "v1.0.0",
+          "issue_key" => "TASK-123",
+          "issue_summary" => "Test task"
+        }
+      ]
+
+      {:ok, report} = ExAutomation.Reporting.update_report(scope, report, %{entries: entries})
+
+      {:ok, show_live, _html} = live(conn, ~p"/reports/#{report}")
+
+      # Click the CSV download button
+      show_live
+      |> element("button[phx-click='download_csv']")
+      |> render_click()
+
+      # Check for success flash message
+      assert render(show_live) =~ "CSV file generated successfully!"
+    end
+
+    test "shows CSV download button even when report has no entries", %{conn: conn, scope: scope} do
+      report = report_fixture(scope, %{name: "Empty CSV Report", year: 2024})
+
+      {:ok, show_live, html} = live(conn, ~p"/reports/#{report}")
+
+      # CSV download button should still be present even for empty reports
+      assert html =~ "Download CSV"
+      assert has_element?(show_live, "button[phx-click='download_csv']")
+
+      # Click should still work and show success message
+      show_live
+      |> element("button[phx-click='download_csv']")
+      |> render_click()
+
+      assert render(show_live) =~ "CSV file generated successfully!"
+    end
   end
 
   describe "New" do

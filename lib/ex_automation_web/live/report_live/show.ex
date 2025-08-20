@@ -31,11 +31,11 @@ defmodule ExAutomationWeb.ReportLive.Show do
         </:item>
       </.list>
 
-      <%= if @report.entries != [] do %>
-        <div class="mt-8">
-          <div class="mb-4 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">{gettext("Report Data")}</h3>
-            <div class="flex gap-2">
+      <div class="mt-8">
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-900">{gettext("Report Data")}</h3>
+          <div class="flex gap-2">
+            <%= if @report.entries != [] do %>
               <button
                 type="button"
                 phx-click="toggle_all_json"
@@ -51,8 +51,18 @@ defmodule ExAutomationWeb.ReportLive.Show do
               >
                 <.icon name="hero-document-duplicate" class="mr-2 h-4 w-4" /> {gettext("Copy JSON")}
               </button>
-            </div>
+            <% end %>
+            <button
+              type="button"
+              phx-click="download_csv"
+              class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              <.icon name="hero-arrow-down-tray" class="mr-2 h-4 w-4" /> {gettext("Download CSV")}
+            </button>
           </div>
+        </div>
+
+        <%= if @report.entries != [] do %>
           <div class="bg-base-300 relative overflow-x-auto rounded-lg p-4 shadow-inner">
             <div class="font-mono text-base-content text-sm leading-6" id="json-viewer">
               <.render_foldable_json
@@ -68,10 +78,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
               count: length(@report.entries)
             )} • {gettext("Foldable JSON viewer")}
           </p>
-        </div>
-      <% else %>
-        <div class="mt-8">
-          <h3 class="mb-4 text-lg font-semibold text-gray-900">{gettext("Report Data")}</h3>
+        <% else %>
           <div class="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center">
             <.icon name="hero-document-text" class="mx-auto h-12 w-12 text-gray-400" />
             <h4 class="mt-4 text-sm font-medium text-gray-900">
@@ -83,8 +90,8 @@ defmodule ExAutomationWeb.ReportLive.Show do
               )}
             </p>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </Layouts.app>
     """
   end
@@ -101,6 +108,19 @@ defmodule ExAutomationWeb.ReportLive.Show do
      |> assign(:report, Reporting.get_report!(socket.assigns.current_scope, id))
      |> assign(:expanded_nodes, MapSet.new())
      |> assign(:all_expanded, false)}
+  end
+
+  @impl true
+  def handle_event("download_csv", _params, socket) do
+    csv_content = generate_csv(socket.assigns.report)
+
+    filename =
+      "report_#{socket.assigns.report.id}_#{socket.assigns.report.name |> String.replace(~r/[^\w\-_]/, "_")}.csv"
+
+    {:noreply,
+     socket
+     |> push_event("download_csv", %{content: csv_content, filename: filename})
+     |> put_flash(:info, gettext("CSV file generated successfully!"))}
   end
 
   @impl true
@@ -140,6 +160,54 @@ defmodule ExAutomationWeb.ReportLive.Show do
   defp format_json(data) do
     data
     |> Jason.encode!(pretty: true)
+  end
+
+  defp generate_csv(report) do
+    if Enum.empty?(report.entries) do
+      # Return empty CSV with headers only
+      [
+        [
+          "release_name",
+          "release_date",
+          "issue_key",
+          "issue_summary",
+          "issue_type",
+          "issue_status",
+          "initiative_key",
+          "initiative_summary"
+        ]
+      ]
+      |> CSV.encode()
+      |> Enum.to_list()
+      |> IO.iodata_to_binary()
+    else
+      # Get all unique keys from all entries to create comprehensive headers
+      all_keys =
+        report.entries
+        |> Enum.flat_map(&Map.keys/1)
+        |> Enum.uniq()
+        |> Enum.sort()
+
+      # Generate CSV with headers and data rows
+      headers = [all_keys]
+
+      data_rows =
+        report.entries
+        |> Enum.map(fn entry ->
+          Enum.map(all_keys, fn key ->
+            case Map.get(entry, key) do
+              nil -> ""
+              value when is_binary(value) -> value
+              value -> inspect(value)
+            end
+          end)
+        end)
+
+      (headers ++ data_rows)
+      |> CSV.encode()
+      |> Enum.to_list()
+      |> IO.iodata_to_binary()
+    end
   end
 
   @impl true
