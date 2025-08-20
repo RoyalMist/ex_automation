@@ -5,7 +5,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
   @impl true
   def render(assigns) do
     cell_classes = fn report ->
-      base_classes = if !report.completed, do: "opacity-60", else: ""
+      base_classes = if report.completed, do: "", else: "opacity-60"
 
       cursor_classes =
         if report.completed, do: "cursor-pointer hover:bg-base-200", else: "cursor-not-allowed"
