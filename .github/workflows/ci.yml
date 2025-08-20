@@ -97,7 +97,14 @@ jobs:
       - run: mix do assets.setup, compile --warnings-as-errors, assets.deploy, release --overwrite
       - uses: aquasecurity/trivy-action@0.32.0
         with:
+          scan-type: "config"
+          format: "table"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+      - uses: aquasecurity/trivy-action@0.32.0
+        with:
           scan-type: "fs"
+          scan-ref: "."
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
