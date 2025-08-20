@@ -1,6 +1,7 @@
 defmodule ExAutomation.JiraTest do
   use ExAutomation.DataCase
   alias ExAutomation.Jira
+  alias ExAutomation.Jira.Client
 
   describe "get_ticket/4" do
     test "has correct function signature and delegates properly" do
@@ -117,7 +118,7 @@ defmodule ExAutomation.JiraTest do
     test "delegation maintains function arities" do
       # Jira context functions should have same arity as Client functions
       jira_functions = Jira.__info__(:functions)
-      client_functions = ExAutomation.Jira.Client.__info__(:functions)
+      client_functions = Client.__info__(:functions)
 
       # get_ticket should have same arity in both modules
       assert Keyword.get(jira_functions, :get_ticket) ==

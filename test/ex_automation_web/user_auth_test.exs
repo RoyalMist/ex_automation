@@ -1,10 +1,10 @@
 defmodule ExAutomationWeb.UserAuthTest do
   use ExAutomationWeb.ConnCase, async: true
 
-  alias Phoenix.LiveView
   alias ExAutomation.Accounts
   alias ExAutomation.Accounts.Scope
   alias ExAutomationWeb.UserAuth
+  alias Phoenix.LiveView
 
   import ExAutomation.AccountsFixtures
 

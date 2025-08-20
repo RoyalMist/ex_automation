@@ -6,7 +6,7 @@ defmodule ExAutomation.Accounts do
   import Ecto.Query, warn: false
   alias ExAutomation.Repo
 
-  alias ExAutomation.Accounts.{User, UserToken, UserNotifier}
+  alias ExAutomation.Accounts.{User, UserNotifier, UserToken}
 
   ## Database getters
 

@@ -45,32 +45,30 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
          release_date: release_date,
          tag: tag
        ) do
-    try do
-      issue = Jira.get_issue_by_key!(tag)
-      initiative = get_initiative(issue)
+    issue = Jira.get_issue_by_key!(tag)
+    initiative = get_initiative(issue)
 
-      {initiative_key, initiative_summary} =
-        if initiative.key != issue.key do
-          {initiative.key, initiative.summary}
-        else
-          {"N/A", "N/A"}
-        end
+    {initiative_key, initiative_summary} =
+      if initiative.key != issue.key do
+        {initiative.key, initiative.summary}
+      else
+        {"N/A", "N/A"}
+      end
 
-      %{
-        "release_name" => release_name,
-        "release_date" => release_date,
-        "issue_key" => issue.key,
-        "issue_summary" => issue.summary,
-        "issue_type" => issue.type,
-        "issue_status" => issue.status,
-        "initiative_key" => initiative_key,
-        "initiative_summary" => initiative_summary
-      }
-    rescue
-      e ->
-        Logger.info("impossible to create entry with #{inspect(e)}")
-        nil
-    end
+    %{
+      "release_name" => release_name,
+      "release_date" => release_date,
+      "issue_key" => issue.key,
+      "issue_summary" => issue.summary,
+      "issue_type" => issue.type,
+      "issue_status" => issue.status,
+      "initiative_key" => initiative_key,
+      "initiative_summary" => initiative_summary
+    }
+  rescue
+    e ->
+      Logger.info("impossible to create entry with #{inspect(e)}")
+      nil
   end
 
   defp get_initiative(%Issue{parent_id: parent_id}) when parent_id != nil do

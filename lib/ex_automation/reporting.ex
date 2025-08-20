@@ -4,9 +4,10 @@ defmodule ExAutomation.Reporting do
   """
 
   import Ecto.Query, warn: false
+  alias ExAutomation.Accounts.Scope
+  alias ExAutomation.Jobs.MonthlyReportWorker
   alias ExAutomation.Repo
   alias ExAutomation.Reporting.Report
-  alias ExAutomation.Accounts.Scope
 
   @doc """
   Subscribes to scoped notifications about any report changes.
@@ -78,7 +79,7 @@ defmodule ExAutomation.Reporting do
       broadcast_reports(scope, {:created, report})
 
       %{user_id: scope.user.id, report_id: report.id, year: report.year}
-      |> ExAutomation.Jobs.MonthlyReportWorker.new()
+      |> MonthlyReportWorker.new()
       |> Oban.insert()
 
       {:ok, report}

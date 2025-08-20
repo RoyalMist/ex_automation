@@ -86,8 +86,8 @@ defmodule ExAutomation.ReportingTest do
       attrs = %{name: "test report", year: 2023, completed: true, entries: []}
 
       changeset =
-        ExAutomation.Reporting.Report.create_changeset(
-          %ExAutomation.Reporting.Report{},
+        Report.create_changeset(
+          %Report{},
           attrs,
           scope
         )
@@ -108,7 +108,7 @@ defmodule ExAutomation.ReportingTest do
       attrs = %{name: "updated report", year: 2024, completed: true}
 
       changeset =
-        ExAutomation.Reporting.Report.changeset(
+        Report.changeset(
           report,
           attrs,
           scope

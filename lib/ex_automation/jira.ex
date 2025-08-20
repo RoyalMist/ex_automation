@@ -1,7 +1,7 @@
 defmodule ExAutomation.Jira do
   import Ecto.Query, warn: false
-  alias ExAutomation.Repo
   alias ExAutomation.Jira.Issue
+  alias ExAutomation.Repo
 
   @doc """
   Subscribes to notifications about any issue changes.
@@ -13,7 +13,7 @@ defmodule ExAutomation.Jira do
     * {:deleted, %Issue{}}
 
   """
-  def subscribe_issues() do
+  def subscribe_issues do
     Phoenix.PubSub.subscribe(ExAutomation.PubSub, "issues")
   end
 
@@ -79,7 +79,7 @@ defmodule ExAutomation.Jira do
       [%Issue{}, ...]
 
   """
-  def list_issues() do
+  def list_issues do
     Repo.all(Issue)
   end
 
@@ -205,7 +205,7 @@ defmodule ExAutomation.Jira do
       [%Issue{parent_id: nil}, ...]
 
   """
-  def list_root_issues() do
+  def list_root_issues do
     from(i in Issue, where: is_nil(i.parent_id))
     |> Repo.all()
   end

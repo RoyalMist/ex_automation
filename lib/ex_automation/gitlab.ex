@@ -4,8 +4,8 @@ defmodule ExAutomation.Gitlab do
   """
 
   import Ecto.Query, warn: false
-  alias ExAutomation.Repo
   alias ExAutomation.Gitlab.Release
+  alias ExAutomation.Repo
 
   @doc """
   Subscribes to notifications about any release changes.
@@ -17,7 +17,7 @@ defmodule ExAutomation.Gitlab do
     * {:deleted, %Release{}}
 
   """
-  def subscribe_releases() do
+  def subscribe_releases do
     Phoenix.PubSub.subscribe(ExAutomation.PubSub, "releases")
   end
 
@@ -55,7 +55,7 @@ defmodule ExAutomation.Gitlab do
       [%Release{}, ...]
 
   """
-  def list_releases() do
+  def list_releases do
     Repo.all(Release)
   end
 

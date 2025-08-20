@@ -1,8 +1,8 @@
 defmodule ExAutomation.Accounts.UserNotifier do
   import Swoosh.Email
 
-  alias ExAutomation.Mailer
   alias ExAutomation.Accounts.User
+  alias ExAutomation.Mailer
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do

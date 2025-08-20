@@ -1,6 +1,7 @@
 defmodule ExAutomation.Jobs.Base.GitlabFetchReleasesWorker do
   use Oban.Worker, queue: :data, priority: 1, max_attempts: 1
   alias ExAutomation.Gitlab.Client
+  alias ExAutomation.Jobs.Base.GitlabSaveReleaseWorker
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"page" => page}}) do
@@ -22,7 +23,7 @@ defmodule ExAutomation.Jobs.Base.GitlabFetchReleasesWorker do
   defp create_save_job(releases, page) do
     for release <- releases do
       %{release: release}
-      |> ExAutomation.Jobs.Base.GitlabSaveReleaseWorker.new()
+      |> GitlabSaveReleaseWorker.new()
       |> Oban.insert()
     end
 

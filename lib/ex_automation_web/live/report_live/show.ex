@@ -203,17 +203,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       # Generate CSV with headers and data rows
       headers = [title_case_headers]
 
-      data_rows =
-        report.entries
-        |> Enum.map(fn entry ->
-          Enum.map(ordered_keys, fn key ->
-            case Map.get(entry, key) do
-              nil -> ""
-              value when is_binary(value) -> value
-              value -> inspect(value)
-            end
-          end)
-        end)
+      data_rows = Enum.map(report.entries, &entry_to_row(&1, ordered_keys))
 
       (headers ++ data_rows)
       |> CSV.encode()
@@ -222,11 +212,18 @@ defmodule ExAutomationWeb.ReportLive.Show do
     end
   end
 
+  defp entry_to_row(entry, ordered_keys) do
+    Enum.map(ordered_keys, &format_entry_value(Map.get(entry, &1)))
+  end
+
+  defp format_entry_value(nil), do: ""
+  defp format_entry_value(value) when is_binary(value), do: value
+  defp format_entry_value(value), do: inspect(value)
+
   defp snake_case_to_title_case(snake_case_string) do
     snake_case_string
     |> String.split("_")
-    |> Enum.map(&String.capitalize/1)
-    |> Enum.join(" ")
+    |> Enum.map_join(" ", &String.capitalize/1)
   end
 
   @impl true
