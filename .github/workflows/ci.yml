@@ -120,7 +120,7 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
   build:
-    name: PRODUCTION DEPLOYMENT
+    name: DEPLOYMENT
     needs: [security]
     if: ${{ contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-24.04
