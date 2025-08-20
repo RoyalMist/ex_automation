@@ -8,8 +8,8 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Release {@release.id}
-        <:subtitle>This is a release record from your database.</:subtitle>
+        {gettext("Release")} {@release.id}
+        <:subtitle>{gettext("This is a release record from your database.")}</:subtitle>
         <:actions>
           <.button navigate={~p"/releases"}>
             <.icon name="hero-arrow-left" />
@@ -18,9 +18,9 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
       </.header>
 
       <.list>
-        <:item title="Name">{@release.name}</:item>
-        <:item title="Date">{@release.date}</:item>
-        <:item title="Description">{@release.description}</:item>
+        <:item title={gettext("Name")}>{@release.name}</:item>
+        <:item title={gettext("Date")}>{@release.date}</:item>
+        <:item title={gettext("Description")}>{@release.description}</:item>
       </.list>
     </Layouts.app>
     """
@@ -34,7 +34,7 @@ defmodule ExAutomationWeb.ReleaseLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Release")
+     |> assign(:page_title, gettext("Show Release"))
      |> assign(:release, Gitlab.get_release!(id))}
   end
 

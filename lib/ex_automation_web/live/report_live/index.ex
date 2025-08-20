@@ -18,10 +18,10 @@ defmodule ExAutomationWeb.ReportLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Reports
+        {gettext("Listing Reports")}
         <:actions>
           <.button variant="primary" navigate={~p"/reports/new"}>
-            <.icon name="hero-plus" /> New Report
+            <.icon name="hero-plus" /> {gettext("New Report")}
           </.button>
         </:actions>
       </.header>
@@ -35,7 +35,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
           end
         }
       >
-        <:col :let={{_id, report}} label="Name">
+        <:col :let={{_id, report}} label={gettext("Name")}>
           <span
             data-completed={to_string(report.completed)}
             class={@cell_classes.(report)}
@@ -43,7 +43,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
             {report.name}
           </span>
         </:col>
-        <:col :let={{_id, report}} label="Year">
+        <:col :let={{_id, report}} label={gettext("Year")}>
           <span
             data-completed={to_string(report.completed)}
             class={@cell_classes.(report)}
@@ -51,7 +51,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
             {report.year}
           </span>
         </:col>
-        <:col :let={{_id, report}} label="Completed">
+        <:col :let={{_id, report}} label={gettext("Completed")}>
           <span
             data-completed={to_string(report.completed)}
             class={@cell_classes.(report)}
@@ -61,15 +61,15 @@ defmodule ExAutomationWeb.ReportLive.Index do
         </:col>
         <:action :let={{_id, report}}>
           <div class="sr-only">
-            <.link navigate={~p"/reports/#{report}"}>Show</.link>
+            <.link navigate={~p"/reports/#{report}"}>{gettext("Show")}</.link>
           </div>
         </:action>
         <:action :let={{id, report}}>
           <.link
             phx-click={JS.push("delete", value: %{id: report.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm={gettext("Are you sure?")}
           >
-            Delete
+            {gettext("Delete")}
           </.link>
         </:action>
       </.table>
@@ -85,7 +85,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Reports")
+     |> assign(:page_title, gettext("Listing Reports"))
      |> stream(:reports, Reporting.list_reports(socket.assigns.current_scope))}
   end
 

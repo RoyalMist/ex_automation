@@ -8,8 +8,8 @@ defmodule ExAutomationWeb.IssueLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Issue {@issue.id}
-        <:subtitle>This is a issue record from your database.</:subtitle>
+        {gettext("Issue")} {@issue.id}
+        <:subtitle>{gettext("This is a issue record from your database.")}</:subtitle>
         <:actions>
           <.button navigate={~p"/issues"}>
             <.icon name="hero-arrow-left" />
@@ -18,11 +18,13 @@ defmodule ExAutomationWeb.IssueLive.Show do
       </.header>
 
       <.list>
-        <:item title="Key">{@issue.key}</:item>
-        <:item title="Parent">{if @issue.parent_id, do: "Child Issue", else: "Root Issue"}</:item>
-        <:item title="Summary">{@issue.summary}</:item>
-        <:item title="Status">{@issue.status}</:item>
-        <:item title="Type">{@issue.type}</:item>
+        <:item title={gettext("Key")}>{@issue.key}</:item>
+        <:item title={gettext("Parent")}>
+          {if @issue.parent_id, do: gettext("Child Issue"), else: gettext("Root Issue")}
+        </:item>
+        <:item title={gettext("Summary")}>{@issue.summary}</:item>
+        <:item title={gettext("Status")}>{@issue.status}</:item>
+        <:item title={gettext("Type")}>{@issue.type}</:item>
       </.list>
     </Layouts.app>
     """
@@ -36,7 +38,7 @@ defmodule ExAutomationWeb.IssueLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Issue")
+     |> assign(:page_title, gettext("Show Issue"))
      |> assign(:issue, Jira.get_issue!(id))}
   end
 

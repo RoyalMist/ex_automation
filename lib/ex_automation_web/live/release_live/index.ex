@@ -8,10 +8,10 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Releases
+        {gettext("Listing Releases")}
         <:actions>
           <.button variant="primary" navigate={~p"/releases/new"}>
-            <.icon name="hero-plus" /> New Release
+            <.icon name="hero-plus" /> {gettext("New Release")}
           </.button>
         </:actions>
       </.header>
@@ -21,20 +21,20 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
         rows={@streams.releases}
         row_click={fn {_id, release} -> JS.navigate(~p"/releases/#{release}") end}
       >
-        <:col :let={{_id, release}} label="Name">{release.name}</:col>
-        <:col :let={{_id, release}} label="Date">{release.date}</:col>
-        <:col :let={{_id, release}} label="Description">{release.description}</:col>
+        <:col :let={{_id, release}} label={gettext("Name")}>{release.name}</:col>
+        <:col :let={{_id, release}} label={gettext("Date")}>{release.date}</:col>
+        <:col :let={{_id, release}} label={gettext("Description")}>{release.description}</:col>
         <:action :let={{_id, release}}>
           <div class="sr-only">
-            <.link navigate={~p"/releases/#{release}"}>Show</.link>
+            <.link navigate={~p"/releases/#{release}"}>{gettext("Show")}</.link>
           </div>
         </:action>
         <:action :let={{id, release}}>
           <.link
             phx-click={JS.push("delete", value: %{id: release.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm={gettext("Are you sure?")}
           >
-            Delete
+            {gettext("Delete")}
           </.link>
         </:action>
       </.table>
@@ -50,7 +50,7 @@ defmodule ExAutomationWeb.ReleaseLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Releases")
+     |> assign(:page_title, gettext("Listing Releases"))
      |> stream(:releases, Gitlab.list_releases())}
   end
 

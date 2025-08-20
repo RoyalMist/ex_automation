@@ -34,20 +34,26 @@
     <ul class="menu menu-horizontal relative z-10 flex w-full items-center justify-end gap-4 px-4 sm:px-6 lg:px-8">
       <%= if @current_scope do %>
         <li>
-          {@current_scope.user.email}
+          <.link href={~p"/"}>{gettext("Home")}</.link>
         </li>
         <li>
-          <.link href={~p"/users/settings"}>Settings</.link>
+          <.link href={~p"/reports"}>{gettext("Reports")}</.link>
         </li>
         <li>
-          <.link href={~p"/users/log-out"} method="delete">Log out</.link>
+          <.link href={~p"/workflows"} target="_blank">{gettext("Workflows")}</.link>
+        </li>
+        <li>
+          <.link href={~p"/users/settings"}>{gettext("Settings")}</.link>
+        </li>
+        <li>
+          <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
         </li>
       <% else %>
         <li>
-          <.link href={~p"/users/register"}>Register</.link>
+          <.link href={~p"/users/register"}>{gettext("Register")}</.link>
         </li>
         <li>
-          <.link href={~p"/users/log-in"}>Log in</.link>
+          <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
         </li>
       <% end %>
     </ul>

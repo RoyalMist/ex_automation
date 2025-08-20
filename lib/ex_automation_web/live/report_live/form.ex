@@ -10,16 +10,20 @@ defmodule ExAutomationWeb.ReportLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage report records in your database.</:subtitle>
+        <:subtitle>{gettext("Use this form to manage report records in your database.")}</:subtitle>
       </.header>
 
       <.form for={@form} id="report-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:year]} type="number" label="Year" />
+        <.input field={@form[:name]} type="text" label={gettext("Name")} />
+        <.input field={@form[:year]} type="number" label={gettext("Year")} />
 
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Report</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @report)}>Cancel</.button>
+          <.button phx-disable-with={gettext("Saving...")} variant="primary">
+            {gettext("Save Report")}
+          </.button>
+          <.button navigate={return_path(@current_scope, @return_to, @report)}>
+            {gettext("Cancel")}
+          </.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -41,7 +45,7 @@ defmodule ExAutomationWeb.ReportLive.Form do
     report = %Report{user_id: socket.assigns.current_scope.user.id}
 
     socket
-    |> assign(:page_title, "New Report")
+    |> assign(:page_title, gettext("New Report"))
     |> assign(:report, report)
     |> assign(
       :form,
@@ -66,7 +70,7 @@ defmodule ExAutomationWeb.ReportLive.Form do
       {:ok, report} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Report created successfully")
+         |> put_flash(:info, gettext("Report created successfully"))
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, report)
          )}

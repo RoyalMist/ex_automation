@@ -32,7 +32,6 @@ config :ex_automation, ExAutomationWeb.Endpoint,
 
 config :ex_automation, dev_routes: true
 config :logger, :default_formatter, format: "[$level] $message\n"
-config :logger, level: :warning
 config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 

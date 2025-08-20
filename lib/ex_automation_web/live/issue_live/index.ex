@@ -8,10 +8,10 @@ defmodule ExAutomationWeb.IssueLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Issues
+        {gettext("Listing Issues")}
         <:actions>
           <.button variant="primary" navigate={~p"/issues/new"}>
-            <.icon name="hero-plus" /> New Issue
+            <.icon name="hero-plus" /> {gettext("New Issue")}
           </.button>
         </:actions>
       </.header>
@@ -21,24 +21,24 @@ defmodule ExAutomationWeb.IssueLive.Index do
         rows={@streams.issues}
         row_click={fn {_id, issue} -> JS.navigate(~p"/issues/#{issue}") end}
       >
-        <:col :let={{_id, issue}} label="Key">{issue.key}</:col>
-        <:col :let={{_id, issue}} label="Parent">
-          {if issue.parent_id, do: "Child", else: "Root"}
+        <:col :let={{_id, issue}} label={gettext("Key")}>{issue.key}</:col>
+        <:col :let={{_id, issue}} label={gettext("Parent")}>
+          {if issue.parent_id, do: gettext("Child"), else: gettext("Root")}
         </:col>
-        <:col :let={{_id, issue}} label="Summary">{issue.summary}</:col>
-        <:col :let={{_id, issue}} label="Status">{issue.status}</:col>
-        <:col :let={{_id, issue}} label="Type">{issue.type}</:col>
+        <:col :let={{_id, issue}} label={gettext("Summary")}>{issue.summary}</:col>
+        <:col :let={{_id, issue}} label={gettext("Status")}>{issue.status}</:col>
+        <:col :let={{_id, issue}} label={gettext("Type")}>{issue.type}</:col>
         <:action :let={{_id, issue}}>
           <div class="sr-only">
-            <.link navigate={~p"/issues/#{issue}"}>Show</.link>
+            <.link navigate={~p"/issues/#{issue}"}>{gettext("Show")}</.link>
           </div>
         </:action>
         <:action :let={{id, issue}}>
           <.link
             phx-click={JS.push("delete", value: %{id: issue.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm={gettext("Are you sure?")}
           >
-            Delete
+            {gettext("Delete")}
           </.link>
         </:action>
       </.table>
@@ -54,7 +54,7 @@ defmodule ExAutomationWeb.IssueLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Issues")
+     |> assign(:page_title, gettext("Listing Issues"))
      |> stream(:issues, Jira.list_issues())}
   end
 

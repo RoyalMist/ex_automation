@@ -7,8 +7,8 @@ defmodule ExAutomationWeb.ReportLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Report {@report.id}
-        <:subtitle>This is a report record from your database.</:subtitle>
+        {gettext("Report")} {@report.id}
+        <:subtitle>{gettext("This is a report record from your database.")}</:subtitle>
         <:actions>
           <.button navigate={~p"/reports"}>
             <.icon name="hero-arrow-left" />
@@ -17,14 +17,16 @@ defmodule ExAutomationWeb.ReportLive.Show do
       </.header>
 
       <.list>
-        <:item title="Name">{@report.name}</:item>
-        <:item title="Year">{@report.year}</:item>
-        <:item title="Completed">{if @report.completed, do: "Yes", else: "No"}</:item>
-        <:item title="Entries Count">{length(@report.entries)}</:item>
-        <:item title="Created">
+        <:item title={gettext("Name")}>{@report.name}</:item>
+        <:item title={gettext("Year")}>{@report.year}</:item>
+        <:item title={gettext("Completed")}>
+          {if @report.completed, do: gettext("Yes"), else: gettext("No")}
+        </:item>
+        <:item title={gettext("Entries Count")}>{length(@report.entries)}</:item>
+        <:item title={gettext("Created")}>
           {Calendar.strftime(@report.inserted_at, "%B %d, %Y at %I:%M %p")}
         </:item>
-        <:item title="Last Updated">
+        <:item title={gettext("Last Updated")}>
           {Calendar.strftime(@report.updated_at, "%B %d, %Y at %I:%M %p")}
         </:item>
       </.list>
@@ -32,7 +34,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       <%= if @report.entries != [] do %>
         <div class="mt-8">
           <div class="mb-4 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Report Data</h3>
+            <h3 class="text-lg font-semibold text-gray-900">{gettext("Report Data")}</h3>
             <div class="flex gap-2">
               <button
                 type="button"
@@ -40,14 +42,14 @@ defmodule ExAutomationWeb.ReportLive.Show do
                 class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 <.icon name="hero-eye" class="mr-2 h-4 w-4" />
-                {if @all_expanded, do: "Collapse All", else: "Expand All"}
+                {if @all_expanded, do: gettext("Collapse All"), else: gettext("Expand All")}
               </button>
               <button
                 type="button"
                 phx-click="copy_json"
                 class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                <.icon name="hero-document-duplicate" class="mr-2 h-4 w-4" /> Copy JSON
+                <.icon name="hero-document-duplicate" class="mr-2 h-4 w-4" /> {gettext("Copy JSON")}
               </button>
             </div>
           </div>
@@ -62,17 +64,23 @@ defmodule ExAutomationWeb.ReportLive.Show do
             </div>
           </div>
           <p class="mt-2 text-xs text-gray-500">
-            {@report.entries |> length()} entries • Foldable JSON viewer
+            {ngettext("%{count} entry", "%{count} entries", length(@report.entries),
+              count: length(@report.entries)
+            )} • {gettext("Foldable JSON viewer")}
           </p>
         </div>
       <% else %>
         <div class="mt-8">
-          <h3 class="mb-4 text-lg font-semibold text-gray-900">Report Data</h3>
+          <h3 class="mb-4 text-lg font-semibold text-gray-900">{gettext("Report Data")}</h3>
           <div class="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center">
             <.icon name="hero-document-text" class="mx-auto h-12 w-12 text-gray-400" />
-            <h4 class="mt-4 text-sm font-medium text-gray-900">No entries available yet</h4>
+            <h4 class="mt-4 text-sm font-medium text-gray-900">
+              {gettext("No entries available yet")}
+            </h4>
             <p class="mt-2 text-sm text-gray-500">
-              Report may still be processing. Entries will appear here once the job completes.
+              {gettext(
+                "Report may still be processing. Entries will appear here once the job completes."
+              )}
             </p>
           </div>
         </div>
@@ -89,7 +97,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Report")
+     |> assign(:page_title, gettext("Show Report"))
      |> assign(:report, Reporting.get_report!(socket.assigns.current_scope, id))
      |> assign(:expanded_nodes, MapSet.new())
      |> assign(:all_expanded, false)}
@@ -102,7 +110,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
     {:noreply,
      socket
      |> push_event("copy_to_clipboard", %{text: json_content})
-     |> put_flash(:info, "JSON copied to clipboard!")}
+     |> put_flash(:info, gettext("JSON copied to clipboard!"))}
   end
 
   @impl true
@@ -141,7 +149,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current report was deleted.")
+     |> put_flash(:error, gettext("The current report was deleted."))
      |> push_navigate(to: ~p"/reports")}
   end
 
@@ -218,7 +226,9 @@ defmodule ExAutomationWeb.ReportLive.Show do
       >
         [+]
       </button>
-      <span class="text-base-content/60 italic">... {length(@data)} items</span>
+      <span class="text-base-content/60 italic">
+        ... {ngettext("%{count} item", "%{count} items", length(@data), count: length(@data))}
+      </span>
       <span class="text-base-content/70 font-bold">]</span>
     <% end %>
     """
@@ -270,7 +280,9 @@ defmodule ExAutomationWeb.ReportLive.Show do
       >
         [+]
       </button>
-      <span class="text-base-content/60 italic">... {Enum.count(@data)} keys</span>
+      <span class="text-base-content/60 italic">
+        ... {ngettext("%{count} key", "%{count} keys", Enum.count(@data), count: Enum.count(@data))}
+      </span>
       <span class="text-base-content/70 font-bold">&rbrace;</span>
     <% end %>
     """
@@ -286,7 +298,7 @@ defmodule ExAutomationWeb.ReportLive.Show do
       <% data when is_boolean(data) -> %>
         <span class="text-error font-medium">{data}</span>
       <% nil -> %>
-        <span class="text-base-content/60 italic">null</span>
+        <span class="text-base-content/60 italic">{gettext("null")}</span>
       <% data -> %>
         <span class="text-purple-400">{inspect(data)}</span>
     <% end %>
