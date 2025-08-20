@@ -76,7 +76,7 @@ jobs:
       - run: mix deps.get
       - run: mix test --max-failures=1 --color
   security:
-    name: SECURITY
+    name: BUILD & SECURITY
     needs: [tools]
     runs-on: ubuntu-24.04
     env:
@@ -106,8 +106,9 @@ jobs:
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
   build:
-    name: BUILD
+    name: PROD
     needs: [lint, test, security]
+    if: ${{ contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-24.04
     env:
       MIX_ENV: prod
@@ -125,23 +126,17 @@ jobs:
             ${{ env.MIX_ENV }}-mise-
       - run: mix deps.get --only prod
       - run: mix do assets.setup, compile --warnings-as-errors, assets.deploy, release --overwrite
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: docker/setup-buildx-action@v3
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: 1password/load-secrets-action/configure@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: 1password/load-secrets-action/configure@v3
         with:
           service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: 1password/load-secrets-action@v3
+      - uses: 1password/load-secrets-action@v3
         with:
           export-env: true
         env:
           SSH_KEY: "op://PrisM/Estimeight SSH Key/private key?ssh-format=openssh"
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ env.SSH_KEY }}
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        run: bundle install
-      - if: ${{ contains(github.ref, 'refs/tags/') }}
-        run: bundle exec kamal setup
+      - run: bundle install
+      - run: bundle exec kamal setup
