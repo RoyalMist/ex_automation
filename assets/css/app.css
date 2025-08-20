@@ -106,16 +106,3 @@
 }
 
 /* This file is for your main application CSS */
-
-/* Custom styles for report table rows */
-.table tbody td[data-completed="true"] {
-    cursor: pointer;
-}
-
-.table tbody td[data-completed="false"] {
-    cursor: not-allowed;
-}
-
-.table tbody tr:hover td[data-completed="true"] {
-    background-color: oklch(var(--color-base-200));
-}

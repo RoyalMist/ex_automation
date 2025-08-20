@@ -4,6 +4,17 @@ defmodule ExAutomationWeb.ReportLive.Index do
 
   @impl true
   def render(assigns) do
+    cell_classes = fn report ->
+      base_classes = if !report.completed, do: "opacity-60", else: ""
+
+      cursor_classes =
+        if report.completed, do: "cursor-pointer hover:bg-base-200", else: "cursor-not-allowed"
+
+      [base_classes, cursor_classes]
+    end
+
+    assigns = assign(assigns, :cell_classes, cell_classes)
+
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
@@ -27,7 +38,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
         <:col :let={{_id, report}} label="Name">
           <span
             data-completed={to_string(report.completed)}
-            class={if !report.completed, do: "opacity-60", else: ""}
+            class={@cell_classes.(report)}
           >
             {report.name}
           </span>
@@ -35,7 +46,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
         <:col :let={{_id, report}} label="Year">
           <span
             data-completed={to_string(report.completed)}
-            class={if !report.completed, do: "opacity-60", else: ""}
+            class={@cell_classes.(report)}
           >
             {report.year}
           </span>
@@ -43,7 +54,7 @@ defmodule ExAutomationWeb.ReportLive.Index do
         <:col :let={{_id, report}} label="Completed">
           <span
             data-completed={to_string(report.completed)}
-            class={if !report.completed, do: "opacity-60", else: ""}
+            class={@cell_classes.(report)}
           >
             {if report.completed, do: "✓", else: "✗"}
           </span>
