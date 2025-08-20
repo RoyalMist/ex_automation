@@ -1,8 +1,6 @@
 defmodule ExAutomation.AccountsTest do
   use ExAutomation.DataCase
-
   alias ExAutomation.Accounts
-
   import ExAutomation.AccountsFixtures
   alias ExAutomation.Accounts.{User, UserToken}
 
