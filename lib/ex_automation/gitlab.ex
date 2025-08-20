@@ -36,7 +36,7 @@ defmodule ExAutomation.Gitlab do
 
   ## Examples
 
-      iex> list_releases(123, "glpat-xxxxxxxxxxxxxxxxxxxx")
+      iex> list_releases(123, "valid -token")
       {:ok, [%{...}, ...]}
 
       iex> list_releases(123, "invalid_token")

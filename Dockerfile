@@ -8,7 +8,7 @@ WORKDIR /app
 RUN chown nobody /app && \
     apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get install -y bash libstdc++6 openssl libncurses6 locales ca-certificates && \
+    apt-get install -y --no-install-recommends bash libstdc++6 openssl libncurses6 locales ca-certificates && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_* && \
     sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
@@ -16,5 +16,6 @@ RUN chown nobody /app && \
 COPY --chown=nobody:root ./_build/prod/rel/ex_automation/ ./
 USER nobody
 RUN mkdir data
+HEALTHCHECK --interval=1m --timeout=3s CMD curl -f http://localhost:4000 || exit 1
 SHELL ["bash", "-c"]
 CMD ["/app/bin/server"]

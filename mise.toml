@@ -18,6 +18,10 @@ run = "rm -rf priv/static erl_crash.dump deps _build .elixir_ls && mix deps.get 
 description = "Setup dev environment"
 run = "mix setup && bundle install"
 
+[tasks."security:scan"]
+description = "Scan for security vulnerabilities"
+run = "trivy fs . --format table && trivy config Dockerfile --format table"
+
 [tasks."production:iex"]
 description = "Open a remote iex session on the production app"
 run = "bundle exec kamal iex"
