@@ -90,7 +90,7 @@ jobs:
       - run: mix deps.get
       - run: mix test --max-failures=1 --color
   security:
-    name: BUILD & SECURITY
+    name: BUILD
     needs: [lint, test]
     runs-on: ubuntu-24.04
     env:
