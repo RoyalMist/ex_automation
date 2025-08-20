@@ -42,7 +42,21 @@ jobs:
       - run: mix hex.audit
       - run: mix deps.audit
       - run: mix credo
-
+      - uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: "config"
+          format: "table"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+      - uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          skip-dirs: _build
+          severity: "CRITICAL,HIGH"
   test:
     name: TEST
     needs: [tools]
@@ -95,27 +109,9 @@ jobs:
             ${{ env.MIX_ENV }}-mise-
       - run: mix deps.get --only prod
       - run: mix do assets.setup, compile --warnings-as-errors, assets.deploy, release --overwrite
-      - name: Trivy Config
-        uses: aquasecurity/trivy-action@0.32.0
-        with:
-          scan-type: "config"
-          format: "table"
-          exit-code: "1"
-          severity: "CRITICAL,HIGH"
-      - name: Trivy FS
-        uses: aquasecurity/trivy-action@0.32.0
-        with:
-          scan-type: "fs"
-          scan-ref: "."
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-          skip-dirs: _build
-          severity: "CRITICAL,HIGH"
       - uses: docker/setup-buildx-action@v3
       - run: docker build -t image:${{ github.sha }} .
-      - name: Trivy Docker
-        uses: aquasecurity/trivy-action@0.32.0
+      - uses: aquasecurity/trivy-action@0.32.0
         with:
           image-ref: "image:${{ github.sha }}"
           format: "table"
