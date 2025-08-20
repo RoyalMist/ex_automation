@@ -1,4 +1,5 @@
 brew "mise"
 brew "hurl"
 brew "git"
+brew "trivy"
 cask "1password-cli"

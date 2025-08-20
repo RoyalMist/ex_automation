@@ -62,7 +62,6 @@ defmodule ExAutomation.MixProject do
       {:phoenix_live_view, "~> 1.1.0"},
       {:postgrex, ">= 0.0.0"},
       {:req, "~> 0.5"},
-      {:sobelow, "~> 0.14"},
       {:swoosh, "~> 1.16"},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:tailwind_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
