@@ -67,21 +67,21 @@ msgstr "Nous ne trouvons pas internet"
 msgid "close"
 msgstr "fermer"
 
-#: lib/ex_automation_web/live/report_live/show.ex:74
+#: lib/ex_automation_web/live/report_live/show.ex:77
 #, elixir-autogen, elixir-format
 msgid "%{count} entry"
 msgid_plural "%{count} entries"
 msgstr[0] "%{count} entry"
 msgstr[1] "%{count} entries"
 
-#: lib/ex_automation_web/live/report_live/show.ex:298
+#: lib/ex_automation_web/live/report_live/show.ex:317
 #, elixir-autogen, elixir-format
 msgid "%{count} item"
 msgid_plural "%{count} items"
 msgstr[0] "%{count} item"
 msgstr[1] "%{count} items"
 
-#: lib/ex_automation_web/live/report_live/show.ex:352
+#: lib/ex_automation_web/live/report_live/show.ex:371
 #, elixir-autogen, elixir-format
 msgid "%{count} key"
 msgid_plural "%{count} keys"
@@ -244,7 +244,7 @@ msgstr "Entries Count"
 msgid "Expand All"
 msgstr "Expand All"
 
-#: lib/ex_automation_web/live/report_live/show.ex:76
+#: lib/ex_automation_web/live/report_live/show.ex:79
 #, elixir-autogen, elixir-format
 msgid "Foldable JSON viewer"
 msgstr "Foldable JSON viewer"
@@ -409,8 +409,7 @@ msgstr "Release"
 msgid "Report"
 msgstr "Rapport"
 
-#: lib/ex_automation_web/live/report_live/show.ex:37
-#: lib/ex_automation_web/live/report_live/show.ex:81
+#: lib/ex_automation_web/live/report_live/show.ex:36
 #, elixir-autogen, elixir-format
 msgid "Report Data"
 msgstr "Report Data"
@@ -490,7 +489,7 @@ msgstr "Status"
 msgid "Summary"
 msgstr "Summary"
 
-#: lib/ex_automation_web/live/report_live/show.ex:220
+#: lib/ex_automation_web/live/report_live/show.ex:239
 #, elixir-autogen, elixir-format
 msgid "The current report was deleted."
 msgstr "The current report was deleted."
@@ -563,7 +562,7 @@ msgstr "You need to reauthenticate to perform sensitive actions on your account.
 msgid "for an account now."
 msgstr "for an account now."
 
-#: lib/ex_automation_web/live/report_live/show.ex:369
+#: lib/ex_automation_web/live/report_live/show.ex:388
 #, elixir-autogen, elixir-format
 msgid "null"
 msgstr "null"
@@ -618,7 +617,7 @@ msgstr "Flux de travail"
 msgid "CSV file generated successfully!"
 msgstr ""
 
-#: lib/ex_automation_web/live/report_live/show.ex:59
+#: lib/ex_automation_web/live/report_live/show.ex:60
 #, elixir-autogen, elixir-format
 msgid "Download CSV"
 msgstr ""

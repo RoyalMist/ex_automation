@@ -167,34 +167,46 @@ defmodule ExAutomationWeb.ReportLive.Show do
       # Return empty CSV with headers only
       [
         [
-          "release_name",
-          "release_date",
-          "issue_key",
-          "issue_summary",
-          "issue_type",
-          "issue_status",
-          "initiative_key",
-          "initiative_summary"
+          "Release Name",
+          "Release Date",
+          "Issue Key",
+          "Issue Summary",
+          "Issue Type",
+          "Issue Status",
+          "Initiative Key",
+          "Initiative Summary"
         ]
       ]
       |> CSV.encode()
       |> Enum.to_list()
       |> IO.iodata_to_binary()
     else
-      # Get all unique keys from all entries to create comprehensive headers
+      # Get all unique keys from all entries
       all_keys =
         report.entries
         |> Enum.flat_map(&Map.keys/1)
         |> Enum.uniq()
+
+      # Order columns: release_name, release_date first, then alphabetical for the rest
+      priority_keys = ["release_name", "release_date"]
+
+      remaining_keys =
+        all_keys
+        |> Enum.reject(fn key -> key in priority_keys end)
         |> Enum.sort()
 
+      ordered_keys = priority_keys ++ remaining_keys
+
+      # Convert snake_case keys to Title Case for headers
+      title_case_headers = Enum.map(ordered_keys, &snake_case_to_title_case/1)
+
       # Generate CSV with headers and data rows
-      headers = [all_keys]
+      headers = [title_case_headers]
 
       data_rows =
         report.entries
         |> Enum.map(fn entry ->
-          Enum.map(all_keys, fn key ->
+          Enum.map(ordered_keys, fn key ->
             case Map.get(entry, key) do
               nil -> ""
               value when is_binary(value) -> value
@@ -208,6 +220,13 @@ defmodule ExAutomationWeb.ReportLive.Show do
       |> Enum.to_list()
       |> IO.iodata_to_binary()
     end
+  end
+
+  defp snake_case_to_title_case(snake_case_string) do
+    snake_case_string
+    |> String.split("_")
+    |> Enum.map(&String.capitalize/1)
+    |> Enum.join(" ")
   end
 
   @impl true

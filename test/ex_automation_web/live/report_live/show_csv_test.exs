@@ -12,34 +12,46 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
         # Return empty CSV with headers only
         [
           [
-            "release_name",
-            "release_date",
-            "issue_key",
-            "issue_summary",
-            "issue_type",
-            "issue_status",
-            "initiative_key",
-            "initiative_summary"
+            "Release Name",
+            "Release Date",
+            "Issue Key",
+            "Issue Summary",
+            "Issue Type",
+            "Issue Status",
+            "Initiative Key",
+            "Initiative Summary"
           ]
         ]
         |> CSV.encode()
         |> Enum.to_list()
         |> IO.iodata_to_binary()
       else
-        # Get all unique keys from all entries to create comprehensive headers
+        # Get all unique keys from all entries
         all_keys =
           report.entries
           |> Enum.flat_map(&Map.keys/1)
           |> Enum.uniq()
+
+        # Order columns: release_name, release_date first, then alphabetical for the rest
+        priority_keys = ["release_name", "release_date"]
+
+        remaining_keys =
+          all_keys
+          |> Enum.reject(fn key -> key in priority_keys end)
           |> Enum.sort()
 
+        ordered_keys = priority_keys ++ remaining_keys
+
+        # Convert snake_case keys to Title Case for headers
+        title_case_headers = Enum.map(ordered_keys, &snake_case_to_title_case/1)
+
         # Generate CSV with headers and data rows
-        headers = [all_keys]
+        headers = [title_case_headers]
 
         data_rows =
           report.entries
           |> Enum.map(fn entry ->
-            Enum.map(all_keys, fn key ->
+            Enum.map(ordered_keys, fn key ->
               case Map.get(entry, key) do
                 nil -> ""
                 value when is_binary(value) -> value
@@ -54,6 +66,13 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
         |> IO.iodata_to_binary()
       end
     end
+
+    def snake_case_to_title_case(snake_case_string) do
+      snake_case_string
+      |> String.split("_")
+      |> Enum.map(&String.capitalize/1)
+      |> Enum.join(" ")
+    end
   end
 
   describe "CSV generation" do
@@ -62,14 +81,14 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
       csv_content = CSVTestHelper.generate_csv(report)
 
       # Should contain headers
-      assert csv_content =~ "release_name"
-      assert csv_content =~ "release_date"
-      assert csv_content =~ "issue_key"
-      assert csv_content =~ "issue_summary"
-      assert csv_content =~ "issue_type"
-      assert csv_content =~ "issue_status"
-      assert csv_content =~ "initiative_key"
-      assert csv_content =~ "initiative_summary"
+      assert csv_content =~ "Release Name"
+      assert csv_content =~ "Release Date"
+      assert csv_content =~ "Issue Key"
+      assert csv_content =~ "Issue Summary"
+      assert csv_content =~ "Issue Type"
+      assert csv_content =~ "Issue Status"
+      assert csv_content =~ "Initiative Key"
+      assert csv_content =~ "Initiative Summary"
 
       # Should only have header row (no data rows)
       lines = String.split(csv_content, "\n", trim: true)
@@ -105,8 +124,8 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
       csv_content = CSVTestHelper.generate_csv(report)
 
       # Should contain headers
-      assert csv_content =~ "release_name"
-      assert csv_content =~ "issue_key"
+      assert csv_content =~ "Release Name"
+      assert csv_content =~ "Issue Key"
 
       # Should contain data from both entries
       assert csv_content =~ "v1.0.0"
@@ -142,11 +161,11 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
       csv_content = CSVTestHelper.generate_csv(report)
 
       # Should include all unique keys from all entries
-      assert csv_content =~ "release_name"
-      assert csv_content =~ "issue_key"
-      assert csv_content =~ "custom_field"
-      assert csv_content =~ "issue_summary"
-      assert csv_content =~ "another_field"
+      assert csv_content =~ "Release Name"
+      assert csv_content =~ "Issue Key"
+      assert csv_content =~ "Custom Field"
+      assert csv_content =~ "Issue Summary"
+      assert csv_content =~ "Another Field"
 
       # Should have values where they exist and empty strings where they don't
       assert csv_content =~ "v1.0.0"
@@ -208,9 +227,9 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
         |> CSV.decode(headers: true)
         |> Enum.to_list()
 
-      assert parsed["release_name"] == "v1.0.0"
-      assert parsed["description"] == "A task with, comma and \"quotes\""
-      assert parsed["notes"] == "Multilinetext"
+      assert parsed["Release Name"] == "v1.0.0"
+      assert parsed["Description"] == "A task with, comma and \"quotes\""
+      assert parsed["Notes"] == "Multilinetext"
     end
 
     test "sorts keys consistently" do
@@ -228,9 +247,10 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
       lines = String.split(csv_content, "\n", trim: true)
       header_line = List.first(lines)
 
-      # Keys should be sorted alphabetically
-      assert String.starts_with?(header_line, "alpha")
-      assert header_line =~ ~r/alpha.*beta.*zebra/
+      # Keys should be sorted with release_name/release_date first, then alphabetically
+      # Since our test data doesn't have release columns, it starts with Release Name,Release Date then Alpha
+      assert String.starts_with?(header_line, "Release Name,Release Date,Alpha")
+      assert header_line =~ ~r/Release Name,Release Date,Alpha.*Beta.*Zebra/
     end
 
     test "handles empty string and nil values correctly" do
@@ -255,12 +275,24 @@ defmodule ExAutomationWeb.ReportLive.ShowCSVTest do
         |> CSV.decode(headers: true)
         |> Enum.to_list()
 
-      assert parsed["name"] == "test"
-      assert parsed["empty_string"] == ""
+      assert parsed["Name"] == "test"
+      assert parsed["Empty String"] == ""
       # nil should become empty string
-      assert parsed["nil_value"] == ""
-      assert parsed["zero"] == "0"
-      assert parsed["false_value"] == "false"
+      assert parsed["Nil Value"] == ""
+      assert parsed["Zero"] == "0"
+      assert parsed["False Value"] == "false"
+    end
+
+    test "snake_case_to_title_case conversion works correctly" do
+      # Test the helper function directly
+      assert CSVTestHelper.snake_case_to_title_case("release_name") == "Release Name"
+      assert CSVTestHelper.snake_case_to_title_case("issue_key") == "Issue Key"
+      assert CSVTestHelper.snake_case_to_title_case("initiative_summary") == "Initiative Summary"
+      assert CSVTestHelper.snake_case_to_title_case("custom_field_name") == "Custom Field Name"
+      assert CSVTestHelper.snake_case_to_title_case("single") == "Single"
+
+      assert CSVTestHelper.snake_case_to_title_case("already_capitalized_field") ==
+               "Already Capitalized Field"
     end
   end
 end
