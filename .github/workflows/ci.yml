@@ -75,9 +75,39 @@ jobs:
             ${{ env.MIX_ENV }}-mise-
       - run: mix deps.get
       - run: mix test --max-failures=1 --color
+  security:
+    name: SECURITY
+    needs: [tools]
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: prod
+    steps:
+      - uses: actions/checkout@v5
+      - uses: jdx/mise-action@v3
+      - uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ env.MIX_ENV }}-mise-${{ hashFiles('**/mise.toml') }}-mix-
+            ${{ env.MIX_ENV }}-mise-
+      - run: mix deps.get --only prod
+      - run: mix do assets.setup, compile --warnings-as-errors, assets.deploy, release --overwrite
+      - uses: docker/setup-buildx-action@v3
+      - run: docker build -t image:${{ github.sha }} .
+      - uses: aquasecurity/trivy-action@0.32.0
+        with:
+          image-ref: "image:${{ github.sha }}"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
   build:
     name: BUILD
-    needs: [lint, test]
+    needs: [lint, test, security]
     runs-on: ubuntu-24.04
     env:
       MIX_ENV: prod
