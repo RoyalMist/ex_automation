@@ -1,4 +1,5 @@
 defmodule ExAutomation.Jobs.Base.JiraFetchIssueWorker do
+  require Logger
   use Oban.Worker, queue: :data, priority: 4, max_attempts: 1
   alias ExAutomation.Jira
 
@@ -28,20 +29,19 @@ defmodule ExAutomation.Jobs.Base.JiraFetchIssueWorker do
       token = System.get_env("JIRA_TOKEN")
       email = System.get_env("JIRA_EMAIL")
 
-      case Jira.get_ticket(key, base_url, token, email) do
-        {:ok, ticket_data} ->
-          ticket = %{
-            "key" => ticket_data["key"],
-            "summary" => ticket_data["fields"]["summary"],
-            "status" => ticket_data["fields"]["status"]["name"],
-            "type" => ticket_data["fields"]["issuetype"]["name"],
-            "parent" => ticket_data["fields"]["parent"]["key"]
-          }
-
-          {:ok, _} = Jira.create_issue(ticket)
-          find_ticket(ticket["parent"])
-
+      with {:ok, ticket_data} <- Jira.get_ticket(key, base_url, token, email),
+           ticket <- %{
+             "key" => ticket_data["key"],
+             "summary" => ticket_data["fields"]["summary"],
+             "status" => ticket_data["fields"]["status"]["name"],
+             "type" => ticket_data["fields"]["issuetype"]["name"],
+             "parent_key" => ticket_data["fields"]["parent"]["key"]
+           },
+           {:ok, _} <- Jira.create_issue(ticket) do
+        find_ticket(ticket["parent_key"])
+      else
         error ->
+          Logger.error("impossible to get jira ticket: #{inspect(error)}")
           error
       end
   end

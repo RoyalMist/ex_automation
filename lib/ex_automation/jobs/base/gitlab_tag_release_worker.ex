@@ -10,6 +10,7 @@ defmodule ExAutomation.Jobs.Base.GitlabTagReleaseWorker do
     tags =
       Regex.scan(~r/\b(?!CVE-)[A-Z]{2,4}-\d{1,10}\b/i, release.description || "")
       |> Enum.map(&hd/1)
+      |> Enum.dedup()
 
     Gitlab.update_release(release, %{tags: tags})
 
