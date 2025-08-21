@@ -20,7 +20,7 @@ defmodule ExAutomationWeb.IssueLive.Show do
       <.list>
         <:item title={gettext("Key")}>{@issue.key}</:item>
         <:item title={gettext("Parent")}>
-          {if @issue.parent_id, do: gettext("Child Issue"), else: gettext("Root Issue")}
+          {if @issue.parent_key, do: @issue.parent_key, else: gettext("Root Issue")}
         </:item>
         <:item title={gettext("Summary")}>{@issue.summary}</:item>
         <:item title={gettext("Status")}>{@issue.status}</:item>

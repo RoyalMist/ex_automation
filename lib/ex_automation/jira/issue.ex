@@ -5,8 +5,8 @@ defmodule ExAutomation.Jira.Issue do
   Issues can have a parent-child relationship where:
   - A parent issue can have multiple children
   - A child issue can have only one parent
-  - Root issues have no parent (parent_id is nil)
-  - When a parent is deleted, children become orphaned (parent_id is set to nil)
+  - Root issues have no parent (parent_key is nil)
+  - When a parent is deleted, children become orphaned (parent_key is set to nil)
 
   ## Examples
 
@@ -24,7 +24,7 @@ defmodule ExAutomation.Jira.Issue do
         summary: "Login form",
         status: "To Do",
         type: "Story",
-        parent_id: epic.id
+        parent_key: epic.key
       })
 
   """
@@ -37,9 +37,8 @@ defmodule ExAutomation.Jira.Issue do
     field :status, :string
     field :type, :string
 
-    # Self-referencing association for hierarchical structure
-    belongs_to :parent, __MODULE__, foreign_key: :parent_id
-    has_many :children, __MODULE__, foreign_key: :parent_id
+    # Parent-child relationship using string keys
+    field :parent_key, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -47,8 +46,8 @@ defmodule ExAutomation.Jira.Issue do
   @doc """
   Changeset for creating and updating issues.
 
-  Supports hierarchical relationships through the optional `parent_id` field.
-  When `parent_id` is provided, it must reference an existing issue.
+  Supports hierarchical relationships through the optional `parent_key` field.
+  When `parent_key` is provided, it must reference an existing issue's key.
 
   ## Required fields
   - `:key` - Unique identifier for the issue
@@ -57,13 +56,35 @@ defmodule ExAutomation.Jira.Issue do
   - `:type` - Issue type (e.g., "Epic", "Story", "Task", "Bug")
 
   ## Optional fields
-  - `:parent_id` - Reference to parent issue (nil for root issues)
+  - `:parent_key` - Reference to parent issue key (nil for root issues)
   """
   def changeset(issue, attrs) do
     issue
-    |> cast(attrs, [:key, :summary, :status, :type, :parent_id])
+    |> cast(attrs, [:key, :summary, :status, :type, :parent_key])
     |> validate_required([:key, :summary, :status, :type])
     |> unique_constraint(:key)
-    |> foreign_key_constraint(:parent_id)
+    |> validate_parent_key_exists()
+  end
+
+  defp validate_parent_key_exists(changeset) do
+    case get_change(changeset, :parent_key) do
+      nil ->
+        changeset
+
+      parent_key when parent_key != "" ->
+        if parent_exists?(parent_key) do
+          changeset
+        else
+          add_error(changeset, :parent_key, "does not exist")
+        end
+
+      _ ->
+        changeset
+    end
+  end
+
+  defp parent_exists?(parent_key) do
+    import Ecto.Query
+    ExAutomation.Repo.exists?(from i in __MODULE__, where: i.key == ^parent_key)
   end
 end

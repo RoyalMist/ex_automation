@@ -418,7 +418,7 @@ defmodule ExAutomation.ReportingTest do
           summary: "Implementation Task",
           type: "Task",
           status: "Done",
-          parent_id: parent_issue.id
+          parent_key: parent_issue.key
         })
 
       # Create releases for 2024 - one without tags, one with tags
@@ -500,7 +500,7 @@ defmodule ExAutomation.ReportingTest do
           summary: "Standalone Story",
           type: "Story",
           status: "Done",
-          parent_id: nil
+          parent_key: nil
         })
 
       parent_issue =
@@ -517,7 +517,7 @@ defmodule ExAutomation.ReportingTest do
           summary: "Critical Bug Fix",
           type: "Bug",
           status: "Fixed",
-          parent_id: parent_issue.id
+          parent_key: parent_issue.key
         })
 
       # Create release with multiple tags
@@ -774,7 +774,7 @@ defmodule ExAutomation.ReportingTest do
           summary: "Feature Epic",
           type: "Epic",
           status: "In Progress",
-          parent_id: grand_parent_issue.id
+          parent_key: grand_parent_issue.key
         })
 
       child_issue =
@@ -783,7 +783,7 @@ defmodule ExAutomation.ReportingTest do
           summary: "Implementation Task",
           type: "Task",
           status: "Done",
-          parent_id: parent_issue.id
+          parent_key: parent_issue.key
         })
 
       # Create release with the child issue as tag

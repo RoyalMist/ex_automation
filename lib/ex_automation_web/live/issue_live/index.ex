@@ -23,7 +23,7 @@ defmodule ExAutomationWeb.IssueLive.Index do
       >
         <:col :let={{_id, issue}} label={gettext("Key")}>{issue.key}</:col>
         <:col :let={{_id, issue}} label={gettext("Parent")}>
-          {if issue.parent_id, do: gettext("Child"), else: gettext("Root")}
+          {if issue.parent_key, do: issue.parent_key, else: gettext("Root")}
         </:col>
         <:col :let={{_id, issue}} label={gettext("Summary")}>{issue.summary}</:col>
         <:col :let={{_id, issue}} label={gettext("Status")}>{issue.status}</:col>

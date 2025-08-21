@@ -42,7 +42,7 @@ defmodule ExAutomation.Jobs.Base.JiraFetchIssueWorker do
 
           if child_issue_id do
             child = Jira.get_issue!(child_issue_id)
-            Jira.update_issue(child, %{parent_id: issue.id})
+            Jira.update_issue(child, %{parent_key: issue.key})
           end
 
           find_ticket(ticket["parent"], issue.id)

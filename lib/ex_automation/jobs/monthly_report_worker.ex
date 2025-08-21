@@ -71,8 +71,8 @@ defmodule ExAutomation.Jobs.MonthlyReportWorker do
       nil
   end
 
-  defp get_initiative(%Issue{parent_id: parent_id}) when parent_id != nil do
-    parent = Jira.get_issue!(parent_id)
+  defp get_initiative(%Issue{parent_key: parent_key}) when parent_key != nil do
+    parent = Jira.get_issue_by_key!(parent_key)
     get_initiative(parent)
   end
 

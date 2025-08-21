@@ -202,11 +202,11 @@ defmodule ExAutomation.Jira do
   ## Examples
 
       iex> list_root_issues()
-      [%Issue{parent_id: nil}, ...]
+      [%Issue{parent_key: nil}, ...]
 
   """
   def list_root_issues do
-    from(i in Issue, where: is_nil(i.parent_id))
+    from(i in Issue, where: is_nil(i.parent_key))
     |> Repo.all()
   end
 
@@ -216,56 +216,57 @@ defmodule ExAutomation.Jira do
   ## Examples
 
       iex> list_children(issue)
-      [%Issue{parent_id: ^issue_id}, ...]
+      [%Issue{parent_key: ^issue_key}, ...]
 
   """
-  def list_children(%Issue{id: issue_id}) do
-    from(i in Issue, where: i.parent_id == ^issue_id)
+  def list_children(%Issue{key: issue_key}) do
+    from(i in Issue, where: i.parent_key == ^issue_key)
     |> Repo.all()
   end
 
   @doc """
-  Gets an issue with its parent preloaded.
+  Gets an issue with its parent.
 
   ## Examples
 
       iex> get_issue_with_parent!(123)
-      %Issue{parent: %Issue{}}
+      {%Issue{}, %Issue{}}
 
   """
   def get_issue_with_parent!(id) do
-    Issue
-    |> Repo.get_by!(id: id)
-    |> Repo.preload(:parent)
+    issue = get_issue!(id)
+    parent = if issue.parent_key, do: get_issue_by_key!(issue.parent_key), else: nil
+    {issue, parent}
   end
 
   @doc """
-  Gets an issue with its children preloaded.
+  Gets an issue with its children.
 
   ## Examples
 
       iex> get_issue_with_children!(123)
-      %Issue{children: [%Issue{}, ...]}
+      {%Issue{}, [%Issue{}, ...]}
 
   """
   def get_issue_with_children!(id) do
-    Issue
-    |> Repo.get_by!(id: id)
-    |> Repo.preload(:children)
+    issue = get_issue!(id)
+    children = list_children(issue)
+    {issue, children}
   end
 
   @doc """
-  Gets an issue with both parent and children preloaded.
+  Gets an issue with both parent and children.
 
   ## Examples
 
       iex> get_issue_with_family!(123)
-      %Issue{parent: %Issue{}, children: [%Issue{}, ...]}
+      {%Issue{}, %Issue{} | nil, [%Issue{}, ...]}
 
   """
   def get_issue_with_family!(id) do
-    Issue
-    |> Repo.get_by!(id: id)
-    |> Repo.preload([:parent, :children])
+    issue = get_issue!(id)
+    parent = if issue.parent_key, do: get_issue_by_key!(issue.parent_key), else: nil
+    children = list_children(issue)
+    {issue, parent, children}
   end
 end

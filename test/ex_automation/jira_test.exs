@@ -135,7 +135,7 @@ defmodule ExAutomation.JiraTest do
 
     import ExAutomation.JiraFixtures
 
-    @invalid_attrs %{status: nil, type: nil, key: nil, summary: nil, parent_id: nil}
+    @invalid_attrs %{status: nil, type: nil, key: nil, summary: nil, parent_key: nil}
 
     test "list_issues/0 returns all issues" do
       issue = issue_fixture()
@@ -171,7 +171,7 @@ defmodule ExAutomation.JiraTest do
       assert issue.type == "some type"
       assert issue.key == "some key"
       assert issue.summary == "some summary"
-      assert issue.parent_id == nil
+      assert issue.parent_key == nil
     end
 
     test "create_issue/1 with invalid data returns error changeset" do
@@ -234,81 +234,83 @@ defmodule ExAutomation.JiraTest do
         type: "some type",
         key: "child key",
         summary: "child summary",
-        parent_id: parent_issue.id
+        parent_key: parent_issue.key
       }
 
       assert {:ok, %Issue{} = child_issue} = Jira.create_issue(child_attrs)
-      assert child_issue.parent_id == parent_issue.id
+      assert child_issue.parent_key == parent_issue.key
     end
 
-    test "create_issue/1 with invalid parent_id returns error changeset" do
+    test "create_issue/1 with invalid parent_key returns error changeset" do
       invalid_attrs = %{
         status: "some status",
         type: "some type",
         key: "some key",
         summary: "some summary",
-        parent_id: 999_999
+        parent_key: "INVALID-KEY"
       }
 
       assert {:error, %Ecto.Changeset{} = changeset} = Jira.create_issue(invalid_attrs)
-      assert "does not exist" in errors_on(changeset).parent_id
+      assert "does not exist" in errors_on(changeset).parent_key
     end
 
     test "update_issue/2 can change parent" do
       parent_issue = issue_fixture()
       child_issue = issue_fixture()
 
-      update_attrs = %{parent_id: parent_issue.id}
+      update_attrs = %{parent_key: parent_issue.key}
 
       assert {:ok, %Issue{} = updated_issue} = Jira.update_issue(child_issue, update_attrs)
-      assert updated_issue.parent_id == parent_issue.id
+      assert updated_issue.parent_key == parent_issue.key
     end
 
     test "update_issue/2 can remove parent" do
       parent_issue = issue_fixture()
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
 
-      update_attrs = %{parent_id: nil}
+      update_attrs = %{parent_key: nil}
 
       assert {:ok, %Issue{} = updated_issue} = Jira.update_issue(child_issue, update_attrs)
-      assert updated_issue.parent_id == nil
+      assert updated_issue.parent_key == nil
     end
 
-    test "deleting parent issue nullifies children parent_id" do
+    test "deleting parent issue does not affect children parent_key" do
       parent_issue = issue_fixture()
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
 
       assert {:ok, %Issue{}} = Jira.delete_issue(parent_issue)
 
       # Refresh child issue from database
       refreshed_child = Jira.get_issue!(child_issue.id)
-      assert refreshed_child.parent_id == nil
+      assert refreshed_child.parent_key == parent_issue.key
     end
 
-    test "can load parent association" do
+    test "can get issue with parent" do
       parent_issue = issue_fixture()
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
 
-      child_with_parent = ExAutomation.Repo.preload(child_issue, :parent)
-      assert child_with_parent.parent.id == parent_issue.id
-      assert child_with_parent.parent.key == parent_issue.key
+      {issue, parent} = Jira.get_issue_with_parent!(child_issue.id)
+      assert issue.id == child_issue.id
+      assert parent.id == parent_issue.id
+      assert parent.key == parent_issue.key
     end
 
-    test "can load children association" do
+    test "can get issue with children" do
       parent_issue = issue_fixture()
-      child1 = issue_fixture(%{parent_id: parent_issue.id})
-      child2 = issue_fixture(%{parent_id: parent_issue.id})
+      child1 = issue_fixture(%{parent_key: parent_issue.key})
+      child2 = issue_fixture(%{parent_key: parent_issue.key})
 
-      parent_with_children = ExAutomation.Repo.preload(parent_issue, :children)
-      child_ids = Enum.map(parent_with_children.children, & &1.id)
+      {issue, children} = Jira.get_issue_with_children!(parent_issue.id)
+      child_ids = Enum.map(children, & &1.id)
+      assert issue.id == parent_issue.id
       assert child1.id in child_ids
       assert child2.id in child_ids
-      assert length(parent_with_children.children) == 2
+      assert length(children) == 2
     end
 
     test "list_root_issues/0 returns only issues without parent" do
       parent_issue = issue_fixture()
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
       another_root = issue_fixture()
 
       root_issues = Jira.list_root_issues()
@@ -321,8 +323,8 @@ defmodule ExAutomation.JiraTest do
 
     test "list_children/1 returns all children of an issue" do
       parent_issue = issue_fixture()
-      child1 = issue_fixture(%{parent_id: parent_issue.id})
-      child2 = issue_fixture(%{parent_id: parent_issue.id})
+      child1 = issue_fixture(%{parent_key: parent_issue.key})
+      child2 = issue_fixture(%{parent_key: parent_issue.key})
       other_issue = issue_fixture()
 
       children = Jira.list_children(parent_issue)
@@ -336,49 +338,49 @@ defmodule ExAutomation.JiraTest do
 
     test "get_issue_with_parent!/1 returns issue with parent preloaded" do
       parent_issue = issue_fixture()
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
 
-      issue_with_parent = Jira.get_issue_with_parent!(child_issue.id)
+      {issue, parent} = Jira.get_issue_with_parent!(child_issue.id)
 
-      assert issue_with_parent.id == child_issue.id
-      assert issue_with_parent.parent.id == parent_issue.id
-      assert issue_with_parent.parent.key == parent_issue.key
+      assert issue.id == child_issue.id
+      assert parent.id == parent_issue.id
+      assert parent.key == parent_issue.key
     end
 
     test "get_issue_with_parent!/1 for root issue has nil parent" do
       root_issue = issue_fixture()
 
-      issue_with_parent = Jira.get_issue_with_parent!(root_issue.id)
+      {issue, parent} = Jira.get_issue_with_parent!(root_issue.id)
 
-      assert issue_with_parent.id == root_issue.id
-      assert issue_with_parent.parent == nil
+      assert issue.id == root_issue.id
+      assert parent == nil
     end
 
     test "get_issue_with_children!/1 returns issue with children preloaded" do
       parent_issue = issue_fixture()
-      child1 = issue_fixture(%{parent_id: parent_issue.id})
-      child2 = issue_fixture(%{parent_id: parent_issue.id})
+      child1 = issue_fixture(%{parent_key: parent_issue.key})
+      child2 = issue_fixture(%{parent_key: parent_issue.key})
 
-      issue_with_children = Jira.get_issue_with_children!(parent_issue.id)
+      {issue, children} = Jira.get_issue_with_children!(parent_issue.id)
 
-      assert issue_with_children.id == parent_issue.id
-      child_ids = Enum.map(issue_with_children.children, & &1.id)
+      assert issue.id == parent_issue.id
+      child_ids = Enum.map(children, & &1.id)
       assert child1.id in child_ids
       assert child2.id in child_ids
-      assert length(issue_with_children.children) == 2
+      assert length(children) == 2
     end
 
     test "get_issue_with_family!/1 returns issue with parent and children preloaded" do
       grandparent = issue_fixture()
-      parent_issue = issue_fixture(%{parent_id: grandparent.id})
-      child_issue = issue_fixture(%{parent_id: parent_issue.id})
+      parent_issue = issue_fixture(%{parent_key: grandparent.key})
+      child_issue = issue_fixture(%{parent_key: parent_issue.key})
 
-      issue_with_family = Jira.get_issue_with_family!(parent_issue.id)
+      {issue, parent, children} = Jira.get_issue_with_family!(parent_issue.id)
 
-      assert issue_with_family.id == parent_issue.id
-      assert issue_with_family.parent.id == grandparent.id
-      assert length(issue_with_family.children) == 1
-      assert hd(issue_with_family.children).id == child_issue.id
+      assert issue.id == parent_issue.id
+      assert parent.id == grandparent.id
+      assert length(children) == 1
+      assert hd(children).id == child_issue.id
     end
   end
 end
