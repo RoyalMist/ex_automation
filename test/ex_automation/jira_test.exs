@@ -241,19 +241,6 @@ defmodule ExAutomation.JiraTest do
       assert child_issue.parent_key == parent_issue.key
     end
 
-    test "create_issue/1 with invalid parent_key returns error changeset" do
-      invalid_attrs = %{
-        status: "some status",
-        type: "some type",
-        key: "some key",
-        summary: "some summary",
-        parent_key: "INVALID-KEY"
-      }
-
-      assert {:error, %Ecto.Changeset{} = changeset} = Jira.create_issue(invalid_attrs)
-      assert "does not exist" in errors_on(changeset).parent_key
-    end
-
     test "update_issue/2 can change parent" do
       parent_issue = issue_fixture()
       child_issue = issue_fixture()

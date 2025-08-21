@@ -63,28 +63,5 @@ defmodule ExAutomation.Jira.Issue do
     |> cast(attrs, [:key, :summary, :status, :type, :parent_key])
     |> validate_required([:key, :summary, :status, :type])
     |> unique_constraint(:key)
-    |> validate_parent_key_exists()
-  end
-
-  defp validate_parent_key_exists(changeset) do
-    case get_change(changeset, :parent_key) do
-      nil ->
-        changeset
-
-      parent_key when parent_key != "" ->
-        if parent_exists?(parent_key) do
-          changeset
-        else
-          add_error(changeset, :parent_key, "does not exist")
-        end
-
-      _ ->
-        changeset
-    end
-  end
-
-  defp parent_exists?(parent_key) do
-    import Ecto.Query
-    ExAutomation.Repo.exists?(from i in __MODULE__, where: i.key == ^parent_key)
   end
 end
