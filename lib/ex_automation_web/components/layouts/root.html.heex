@@ -7,6 +7,8 @@
     <.live_title default="ExAutomation">
       {assigns[:page_title]}
     </.live_title>
+    <link rel="icon" type="image/x-icon" href={~p"/favicon.ico"} />
+    <link rel="icon" type="image/svg+xml" href={~p"/images/favicon.svg"} />
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
@@ -34,26 +36,34 @@
     <ul class="menu menu-horizontal relative z-10 flex w-full items-center justify-end gap-4 px-4 sm:px-6 lg:px-8">
       <%= if @current_scope do %>
         <li>
-          <.link href={~p"/"}>{gettext("Home")}</.link>
+          <.link href={~p"/"} class="hover:text-primary">{gettext("Home")}</.link>
         </li>
         <li>
-          <.link href={~p"/reports"}>{gettext("Reports")}</.link>
+          <.link href={~p"/reports"} class="hover:text-primary">{gettext("Reports")}</.link>
         </li>
         <li>
-          <.link href={~p"/workflows"} target="_blank">{gettext("Workflows")}</.link>
+          <.link href={~p"/workflows"} target="_blank" class="hover:text-primary">
+            {gettext("Workflows")}
+          </.link>
         </li>
         <li>
-          <.link href={~p"/users/settings"}>{gettext("Settings")}</.link>
+          <.link href={~p"/users/settings"} class="hover:text-primary">
+            {gettext("Settings")}
+          </.link>
         </li>
         <li>
-          <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
+          <.link href={~p"/users/log-out"} method="delete" class="hover:text-primary">
+            {gettext("Log out")}
+          </.link>
         </li>
       <% else %>
         <li>
-          <.link href={~p"/users/register"}>{gettext("Register")}</.link>
+          <.link href={~p"/users/register"} class="hover:text-primary">
+            {gettext("Register")}
+          </.link>
         </li>
         <li>
-          <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
+          <.link href={~p"/users/log-in"} class="hover:text-primary">{gettext("Log in")}</.link>
         </li>
       <% end %>
     </ul>
