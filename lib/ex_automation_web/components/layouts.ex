@@ -111,7 +111,7 @@ defmodule ExAutomationWeb.Layouts do
         phx-click={JS.dispatch("phx:set-theme")}
         data-phx-theme="light"
       >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
+        <.icon name="hero-light-bulb-micro" class="size-4 opacity-75 hover:opacity-100" />
       </button>
 
       <button
