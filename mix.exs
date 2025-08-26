@@ -33,7 +33,6 @@ defmodule ExAutomation.MixProject do
 
   defp deps do
     [
-      {:tidewave, "~> 0.4", only: [:dev]},
       {:bandit, "~> 1.5"},
       {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.0"},
@@ -67,7 +66,8 @@ defmodule ExAutomation.MixProject do
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:tailwind_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
       {:telemetry_metrics, "~> 1.0"},
-      {:telemetry_poller, "~> 1.0"}
+      {:telemetry_poller, "~> 1.0"},
+      {:tidewave, "~> 0.4", only: [:dev]}
     ]
   end
 
