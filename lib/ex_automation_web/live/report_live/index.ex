@@ -56,7 +56,11 @@ defmodule ExAutomationWeb.ReportLive.Index do
             data-completed={to_string(report.completed)}
             class={@cell_classes.(report)}
           >
-            {if report.completed, do: "✓", else: "✗"}
+            <%= if report.completed do %>
+              <.icon name="hero-check" class="h-5 w-5 text-green-600" />
+            <% else %>
+              <.icon name="hero-x-mark" class="h-5 w-5 text-red-600" />
+            <% end %>
           </span>
         </:col>
         <:action :let={{_id, report}}>

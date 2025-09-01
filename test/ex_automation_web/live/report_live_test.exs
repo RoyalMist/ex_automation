@@ -224,9 +224,9 @@ defmodule ExAutomationWeb.ReportLiveTest do
       html = render(index_live)
       assert html =~ "Report created successfully"
       assert html =~ "some name"
-      # In the table, completed should show ✗ (false), not ✓ (true)
-      assert html =~ "✗"
-      refute html =~ "✓"
+      # In the table, completed should show X icon (false), not check icon (true)
+      assert html =~ "hero-x-mark"
+      refute html =~ "hero-check"
     end
   end
 
