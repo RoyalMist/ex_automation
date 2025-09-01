@@ -11,7 +11,7 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/ex_automation_web/components/core_components.ex:332
+#: lib/ex_automation_web/components/core_components.ex:333
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr "Actions"
@@ -22,22 +22,22 @@ msgstr "Actions"
 msgid "Attempting to reconnect"
 msgstr "Tentative de reconnexion"
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:100
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:111
 #, elixir-autogen, elixir-format
 msgid "Changelog"
 msgstr "Journal des modifications"
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:52
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Guides & Docs"
 msgstr "Guides et Documentation"
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:25
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:36
 #, elixir-autogen, elixir-format
 msgid "Manage your custody reports."
 msgstr "Gérez vos rapports de garde."
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:19
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:30
 #, elixir-autogen, elixir-format
 msgid "Ripple Custody Automation"
 msgstr "Automatisation de Garde Ripple"
@@ -47,12 +47,12 @@ msgstr "Automatisation de Garde Ripple"
 msgid "Something went wrong!"
 msgstr "Quelque chose s'est mal passé !"
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:70
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:81
 #, elixir-autogen, elixir-format
 msgid "Source Code"
 msgstr "Code Source"
 
-#: lib/ex_automation_web/controllers/page_html/home.html.heex:28
+#: lib/ex_automation_web/controllers/page_html/home.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Streamline your custody department operations with automated reporting that seamlessly integrates with Jira and GitLab."
 msgstr "Rationalisez les opérations de votre département de garde avec des rapports automatisés qui s'intègrent parfaitement à Jira et GitLab."
@@ -62,7 +62,7 @@ msgstr "Rationalisez les opérations de votre département de garde avec des rap
 msgid "We can't find the internet"
 msgstr "Nous ne trouvons pas internet"
 
-#: lib/ex_automation_web/components/core_components.ex:70
+#: lib/ex_automation_web/components/core_components.ex:71
 #, elixir-autogen, elixir-format
 msgid "close"
 msgstr "fermer"
@@ -74,14 +74,14 @@ msgid_plural "%{count} entries"
 msgstr[0] "%{count} entry"
 msgstr[1] "%{count} entries"
 
-#: lib/ex_automation_web/live/report_live/show.ex:317
+#: lib/ex_automation_web/live/report_live/show.ex:314
 #, elixir-autogen, elixir-format
 msgid "%{count} item"
 msgid_plural "%{count} items"
 msgstr[0] "%{count} item"
 msgstr[1] "%{count} items"
 
-#: lib/ex_automation_web/live/report_live/show.ex:371
+#: lib/ex_automation_web/live/report_live/show.ex:368
 #, elixir-autogen, elixir-format
 msgid "%{count} key"
 msgid_plural "%{count} keys"
@@ -129,16 +129,6 @@ msgstr "Modifier l'Email"
 #, elixir-autogen, elixir-format
 msgid "Changing..."
 msgstr "Changing..."
-
-#: lib/ex_automation_web/live/issue_live/index.ex:26
-#, elixir-autogen, elixir-format
-msgid "Child"
-msgstr "Child"
-
-#: lib/ex_automation_web/live/issue_live/show.ex:23
-#, elixir-autogen, elixir-format
-msgid "Child Issue"
-msgstr "Child Issue"
 
 #: lib/ex_automation_web/live/report_live/show.ex:45
 #, elixir-autogen, elixir-format
@@ -298,7 +288,7 @@ msgstr "Listing Releases"
 msgid "Listing Reports"
 msgstr "Listing Reports"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:56
+#: lib/ex_automation_web/components/layouts/root.html.heex:66
 #: lib/ex_automation_web/live/user_live/confirmation.ex:53
 #: lib/ex_automation_web/live/user_live/login.ex:13
 #: lib/ex_automation_web/live/user_live/registration.ex:18
@@ -489,7 +479,7 @@ msgstr "Status"
 msgid "Summary"
 msgstr "Summary"
 
-#: lib/ex_automation_web/live/report_live/show.ex:239
+#: lib/ex_automation_web/live/report_live/show.ex:236
 #, elixir-autogen, elixir-format
 msgid "The current report was deleted."
 msgstr "The current report was deleted."
@@ -562,7 +552,7 @@ msgstr "You need to reauthenticate to perform sensitive actions on your account.
 msgid "for an account now."
 msgstr "for an account now."
 
-#: lib/ex_automation_web/live/report_live/show.ex:388
+#: lib/ex_automation_web/live/report_live/show.ex:385
 #, elixir-autogen, elixir-format
 msgid "null"
 msgstr "null"
@@ -582,32 +572,32 @@ msgstr "the mailbox page"
 msgid "to your account now."
 msgstr "to your account now."
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:37
+#: lib/ex_automation_web/components/layouts/root.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Home"
 msgstr "Accueil"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:49
+#: lib/ex_automation_web/components/layouts/root.html.heex:56
 #, elixir-autogen, elixir-format
 msgid "Log out"
 msgstr "Se déconnecter"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:53
+#: lib/ex_automation_web/components/layouts/root.html.heex:62
 #, elixir-autogen, elixir-format
 msgid "Register"
 msgstr "S'inscrire"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:40
+#: lib/ex_automation_web/components/layouts/root.html.heex:42
 #, elixir-autogen, elixir-format
 msgid "Reports"
 msgstr "Rapports"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:46
+#: lib/ex_automation_web/components/layouts/root.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "Settings"
 msgstr "Paramètres"
 
-#: lib/ex_automation_web/components/layouts/root.html.heex:43
+#: lib/ex_automation_web/components/layouts/root.html.heex:46
 #, elixir-autogen, elixir-format
 msgid "Workflows"
 msgstr "Flux de travail"

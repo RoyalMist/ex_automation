@@ -1,210 +1,210 @@
-## This file is a PO Template file.
-##
-## "msgid"s here are often extracted from source code.
-## Add new messages manually only if they're dynamic
-## messages that can't be statically extracted.
-##
-## Run "mix gettext.extract" to bring this file up to
-## date. Leave "msgstr"s empty as changing them here has no
-## effect: edit them in PO (.po) files instead.
-#
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
 msgid ""
 msgstr ""
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: lib/ex_automation_web/components/core_components.ex:333
 #, elixir-autogen, elixir-format
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
 #: lib/ex_automation_web/components/layouts.ex:72
 #: lib/ex_automation_web/components/layouts.ex:84
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
-msgstr ""
+msgstr "Tentativo di riconnessione"
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:111
 #, elixir-autogen, elixir-format
 msgid "Changelog"
-msgstr ""
+msgstr "Registro delle modifiche"
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:63
 #, elixir-autogen, elixir-format
 msgid "Guides & Docs"
-msgstr ""
+msgstr "Guide e Documentazione"
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:36
 #, elixir-autogen, elixir-format
 msgid "Manage your custody reports."
-msgstr ""
+msgstr "Gestisci i tuoi report di custodia."
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:30
 #, elixir-autogen, elixir-format
 msgid "Ripple Custody Automation"
-msgstr ""
+msgstr "Automazione Custodia Ripple"
 
 #: lib/ex_automation_web/components/layouts.ex:79
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
-msgstr ""
+msgstr "Qualcosa è andato storto!"
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:81
 #, elixir-autogen, elixir-format
 msgid "Source Code"
-msgstr ""
+msgstr "Codice Sorgente"
 
 #: lib/ex_automation_web/controllers/page_html/home.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Streamline your custody department operations with automated reporting that seamlessly integrates with Jira and GitLab."
-msgstr ""
+msgstr "Semplifica le operazioni del tuo dipartimento di custodia con report automatizzati che si integrano perfettamente con Jira e GitLab."
 
 #: lib/ex_automation_web/components/layouts.ex:67
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
-msgstr ""
+msgstr "Non riusciamo a trovare la connessione internet"
 
 #: lib/ex_automation_web/components/core_components.ex:71
 #, elixir-autogen, elixir-format
 msgid "close"
-msgstr ""
+msgstr "chiudi"
 
 #: lib/ex_automation_web/live/report_live/show.ex:77
 #, elixir-autogen, elixir-format
 msgid "%{count} entry"
 msgid_plural "%{count} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{count} voce"
+msgstr[1] "%{count} voci"
 
 #: lib/ex_automation_web/live/report_live/show.ex:314
 #, elixir-autogen, elixir-format
 msgid "%{count} item"
 msgid_plural "%{count} items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{count} elemento"
+msgstr[1] "%{count} elementi"
 
 #: lib/ex_automation_web/live/report_live/show.ex:368
 #, elixir-autogen, elixir-format
 msgid "%{count} key"
 msgid_plural "%{count} keys"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%{count} chiave"
+msgstr[1] "%{count} chiavi"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:126
 #, elixir-autogen, elixir-format
 msgid "A link to confirm your email change has been sent to the new address."
-msgstr ""
+msgstr "Un link per confermare la modifica dell'email è stato inviato al nuovo indirizzo."
 
 #: lib/ex_automation_web/live/user_live/settings.ex:14
 #, elixir-autogen, elixir-format
 msgid "Account Settings"
-msgstr ""
+msgstr "Impostazioni Account"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:16
 #, elixir-autogen, elixir-format
 msgid "Already registered?"
-msgstr ""
+msgstr "Già registrato?"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:70
 #, elixir-autogen, elixir-format
 msgid "An email was sent to %{email}, please access it to confirm your account."
-msgstr ""
+msgstr "È stata inviata un'email a %{email}, accedi per confermare il tuo account."
 
 #: lib/ex_automation_web/live/issue_live/index.ex:39
 #: lib/ex_automation_web/live/release_live/index.ex:35
 #: lib/ex_automation_web/live/report_live/index.ex:70
 #, elixir-autogen, elixir-format
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sei sicuro?"
 
 #: lib/ex_automation_web/live/report_live/form.ex:25
 #, elixir-autogen, elixir-format
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:28
 #, elixir-autogen, elixir-format
 msgid "Change Email"
-msgstr ""
+msgstr "Cambia Email"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:27
 #, elixir-autogen, elixir-format
 msgid "Changing..."
-msgstr ""
+msgstr "Modifica in corso..."
 
 #: lib/ex_automation_web/live/report_live/show.ex:45
 #, elixir-autogen, elixir-format
 msgid "Collapse All"
-msgstr ""
+msgstr "Comprimi Tutto"
 
 #: lib/ex_automation_web/live/report_live/index.ex:54
 #: lib/ex_automation_web/live/report_live/show.ex:22
 #, elixir-autogen, elixir-format
 msgid "Completed"
-msgstr ""
+msgstr "Completato"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:37
 #, elixir-autogen, elixir-format
 msgid "Confirm and log in only this time"
-msgstr ""
+msgstr "Conferma e accedi solo questa volta"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:31
 #, elixir-autogen, elixir-format
 msgid "Confirm and stay logged in"
-msgstr ""
+msgstr "Conferma e rimani connesso"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:60
 #, elixir-autogen, elixir-format
 msgid "Confirm new password"
-msgstr ""
+msgstr "Conferma nuova password"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:28
 #: lib/ex_automation_web/live/user_live/confirmation.ex:34
 #, elixir-autogen, elixir-format
 msgid "Confirming..."
-msgstr ""
+msgstr "Conferma in corso..."
 
 #: lib/ex_automation_web/live/report_live/show.ex:52
 #, elixir-autogen, elixir-format
 msgid "Copy JSON"
-msgstr ""
+msgstr "Copia JSON"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:36
 #, elixir-autogen, elixir-format
 msgid "Create an account"
-msgstr ""
+msgstr "Crea un account"
 
 #: lib/ex_automation_web/live/report_live/show.ex:26
 #, elixir-autogen, elixir-format
 msgid "Created"
-msgstr ""
+msgstr "Creato"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:35
 #, elixir-autogen, elixir-format
 msgid "Creating account..."
-msgstr ""
+msgstr "Creazione account in corso..."
 
 #: lib/ex_automation_web/live/release_live/index.ex:25
 #: lib/ex_automation_web/live/release_live/show.ex:22
 #, elixir-autogen, elixir-format
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:41
 #: lib/ex_automation_web/live/release_live/index.ex:37
 #: lib/ex_automation_web/live/report_live/index.ex:72
 #, elixir-autogen, elixir-format
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
 #: lib/ex_automation_web/live/release_live/index.ex:26
 #: lib/ex_automation_web/live/release_live/show.ex:23
 #, elixir-autogen, elixir-format
 msgid "Description"
-msgstr ""
+msgstr "Descrizione"
 
 #: lib/ex_automation_web/live/user_live/login.ex:18
 #, elixir-autogen, elixir-format
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Non hai un account?"
 
 #: lib/ex_automation_web/live/user_live/login.ex:49
 #: lib/ex_automation_web/live/user_live/login.ex:73
@@ -212,81 +212,81 @@ msgstr ""
 #: lib/ex_automation_web/live/user_live/settings.ex:23
 #, elixir-autogen, elixir-format
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:79
 #, elixir-autogen, elixir-format
 msgid "Email change link is invalid or it has expired."
-msgstr ""
+msgstr "Il link per la modifica dell'email non è valido o è scaduto."
 
 #: lib/ex_automation_web/live/user_live/settings.ex:76
 #, elixir-autogen, elixir-format
 msgid "Email changed successfully."
-msgstr ""
+msgstr "Email modificata con successo."
 
 #: lib/ex_automation_web/live/report_live/show.ex:25
 #, elixir-autogen, elixir-format
 msgid "Entries Count"
-msgstr ""
+msgstr "Numero di Voci"
 
 #: lib/ex_automation_web/live/report_live/show.ex:45
 #, elixir-autogen, elixir-format
 msgid "Expand All"
-msgstr ""
+msgstr "Espandi Tutto"
 
 #: lib/ex_automation_web/live/report_live/show.ex:79
 #, elixir-autogen, elixir-format
 msgid "Foldable JSON viewer"
-msgstr ""
+msgstr "Visualizzatore JSON ripiegabile"
 
 #: lib/ex_automation_web/live/user_live/login.ex:120
 #, elixir-autogen, elixir-format
 msgid "If your email is in our system, you will receive instructions for logging in shortly."
-msgstr ""
+msgstr "Se la tua email è nel nostro sistema, riceverai presto le istruzioni per l'accesso."
 
 #: lib/ex_automation_web/live/issue_live/show.ex:11
 #, elixir-autogen, elixir-format
 msgid "Issue"
-msgstr ""
+msgstr "Problema"
 
 #: lib/ex_automation_web/live/report_live/show.ex:133
 #, elixir-autogen, elixir-format
 msgid "JSON copied to clipboard!"
-msgstr ""
+msgstr "JSON copiato negli appunti!"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:62
 #, elixir-autogen, elixir-format
 msgid "Keep me logged in on this device"
-msgstr ""
+msgstr "Mantieni l'accesso su questo dispositivo"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:24
 #: lib/ex_automation_web/live/issue_live/show.ex:21
 #, elixir-autogen, elixir-format
 msgid "Key"
-msgstr ""
+msgstr "Chiave"
 
 #: lib/ex_automation_web/live/report_live/show.ex:29
 #, elixir-autogen, elixir-format
 msgid "Last Updated"
-msgstr ""
+msgstr "Ultimo Aggiornamento"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:11
 #: lib/ex_automation_web/live/issue_live/index.ex:57
 #, elixir-autogen, elixir-format
 msgid "Listing Issues"
-msgstr ""
+msgstr "Elenco Problemi"
 
 #: lib/ex_automation_web/live/release_live/index.ex:11
 #: lib/ex_automation_web/live/release_live/index.ex:53
 #, elixir-autogen, elixir-format
 msgid "Listing Releases"
-msgstr ""
+msgstr "Elenco Rilasci"
 
 #: lib/ex_automation_web/live/report_live/index.ex:21
 #: lib/ex_automation_web/live/report_live/index.ex:88
 #, elixir-autogen, elixir-format
 msgid "Listing Reports"
-msgstr ""
+msgstr "Elenco Report"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:66
 #: lib/ex_automation_web/live/user_live/confirmation.ex:53
@@ -294,44 +294,44 @@ msgstr ""
 #: lib/ex_automation_web/live/user_live/registration.ex:18
 #, elixir-autogen, elixir-format
 msgid "Log in"
-msgstr ""
+msgstr "Accedi"
 
 #: lib/ex_automation_web/live/user_live/login.ex:84
 #, elixir-autogen, elixir-format
 msgid "Log in and stay logged in"
-msgstr ""
+msgstr "Accedi e rimani connesso"
 
 #: lib/ex_automation_web/live/user_live/login.ex:87
 #, elixir-autogen, elixir-format
 msgid "Log in only this time"
-msgstr ""
+msgstr "Accedi solo questa volta"
 
 #: lib/ex_automation_web/live/user_live/login.ex:55
 #, elixir-autogen, elixir-format
 msgid "Log in with email"
-msgstr ""
+msgstr "Accedi con email"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:68
 #, elixir-autogen, elixir-format
 msgid "Log me in only this time"
-msgstr ""
+msgstr "Fammi accedere solo questa volta"
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:52
 #: lib/ex_automation_web/live/user_live/confirmation.ex:59
 #: lib/ex_automation_web/live/user_live/confirmation.ex:65
 #, elixir-autogen, elixir-format
 msgid "Logging in..."
-msgstr ""
+msgstr "Accesso in corso..."
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:91
 #, elixir-autogen, elixir-format
 msgid "Magic link is invalid or it has expired."
-msgstr ""
+msgstr "Il link magico non è valido o è scaduto."
 
 #: lib/ex_automation_web/live/user_live/settings.ex:15
 #, elixir-autogen, elixir-format
 msgid "Manage your account email address and password settings"
-msgstr ""
+msgstr "Gestisci l'indirizzo email e le impostazioni della password del tuo account"
 
 #: lib/ex_automation_web/live/release_live/index.ex:24
 #: lib/ex_automation_web/live/release_live/show.ex:21
@@ -340,274 +340,274 @@ msgstr ""
 #: lib/ex_automation_web/live/report_live/show.ex:20
 #, elixir-autogen, elixir-format
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:14
 #, elixir-autogen, elixir-format
 msgid "New Issue"
-msgstr ""
+msgstr "Nuovo Problema"
 
 #: lib/ex_automation_web/live/release_live/index.ex:14
 #, elixir-autogen, elixir-format
 msgid "New Release"
-msgstr ""
+msgstr "Nuovo Rilascio"
 
 #: lib/ex_automation_web/live/report_live/form.ex:48
 #: lib/ex_automation_web/live/report_live/index.ex:24
 #, elixir-autogen, elixir-format
 msgid "New Report"
-msgstr ""
+msgstr "Nuovo Report"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:53
 #, elixir-autogen, elixir-format
 msgid "New password"
-msgstr ""
+msgstr "Nuova password"
 
 #: lib/ex_automation_web/live/report_live/show.ex:23
 #, elixir-autogen, elixir-format
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: lib/ex_automation_web/live/report_live/show.ex:85
 #, elixir-autogen, elixir-format
 msgid "No entries available yet"
-msgstr ""
+msgstr "Nessuna voce disponibile ancora"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:25
 #: lib/ex_automation_web/live/issue_live/show.ex:22
 #, elixir-autogen, elixir-format
 msgid "Parent"
-msgstr ""
+msgstr "Genitore"
 
 #: lib/ex_automation_web/live/user_live/login.ex:80
 #, elixir-autogen, elixir-format
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:14
 #, elixir-autogen, elixir-format
 msgid "Register for an account"
-msgstr ""
+msgstr "Registrati per un account"
 
 #: lib/ex_automation_web/live/release_live/show.ex:11
 #, elixir-autogen, elixir-format
 msgid "Release"
-msgstr ""
+msgstr "Rilascio"
 
 #: lib/ex_automation_web/live/report_live/show.ex:10
 #, elixir-autogen, elixir-format
 msgid "Report"
-msgstr ""
+msgstr "Report"
 
 #: lib/ex_automation_web/live/report_live/show.ex:36
 #, elixir-autogen, elixir-format
 msgid "Report Data"
-msgstr ""
+msgstr "Dati Report"
 
 #: lib/ex_automation_web/live/report_live/form.ex:73
 #, elixir-autogen, elixir-format
 msgid "Report created successfully"
-msgstr ""
+msgstr "Report creato con successo"
 
 #: lib/ex_automation_web/live/report_live/show.ex:88
 #, elixir-autogen, elixir-format
 msgid "Report may still be processing. Entries will appear here once the job completes."
-msgstr ""
+msgstr "Il report potrebbe essere ancora in elaborazione. Le voci appariranno qui una volta completato il lavoro."
 
 #: lib/ex_automation_web/live/issue_live/index.ex:26
 #, elixir-autogen, elixir-format
 msgid "Root"
-msgstr ""
+msgstr "Radice"
 
 #: lib/ex_automation_web/live/issue_live/show.ex:23
 #, elixir-autogen, elixir-format
 msgid "Root Issue"
-msgstr ""
+msgstr "Problema Radice"
 
 #: lib/ex_automation_web/live/user_live/settings.ex:64
 #, elixir-autogen, elixir-format
 msgid "Save Password"
-msgstr ""
+msgstr "Salva Password"
 
 #: lib/ex_automation_web/live/report_live/form.ex:22
 #, elixir-autogen, elixir-format
 msgid "Save Report"
-msgstr ""
+msgstr "Salva Report"
 
 #: lib/ex_automation_web/live/report_live/form.ex:21
 #: lib/ex_automation_web/live/user_live/settings.ex:63
 #, elixir-autogen, elixir-format
 msgid "Saving..."
-msgstr ""
+msgstr "Salvataggio in corso..."
 
 #: lib/ex_automation_web/live/issue_live/index.ex:33
 #: lib/ex_automation_web/live/release_live/index.ex:29
 #: lib/ex_automation_web/live/report_live/index.ex:64
 #, elixir-autogen, elixir-format
 msgid "Show"
-msgstr ""
+msgstr "Mostra"
 
 #: lib/ex_automation_web/live/issue_live/show.ex:41
 #, elixir-autogen, elixir-format
 msgid "Show Issue"
-msgstr ""
+msgstr "Mostra Problema"
 
 #: lib/ex_automation_web/live/release_live/show.ex:37
 #, elixir-autogen, elixir-format
 msgid "Show Release"
-msgstr ""
+msgstr "Mostra Rilascio"
 
 #: lib/ex_automation_web/live/report_live/show.ex:107
 #, elixir-autogen, elixir-format
 msgid "Show Report"
-msgstr ""
+msgstr "Mostra Report"
 
 #: lib/ex_automation_web/live/user_live/login.ex:22
 #, elixir-autogen, elixir-format
 msgid "Sign up"
-msgstr ""
+msgstr "Registrati"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:29
 #: lib/ex_automation_web/live/issue_live/show.ex:26
 #, elixir-autogen, elixir-format
 msgid "Status"
-msgstr ""
+msgstr "Stato"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:28
 #: lib/ex_automation_web/live/issue_live/show.ex:25
 #, elixir-autogen, elixir-format
 msgid "Summary"
-msgstr ""
+msgstr "Riassunto"
 
 #: lib/ex_automation_web/live/report_live/show.ex:236
 #, elixir-autogen, elixir-format
 msgid "The current report was deleted."
-msgstr ""
+msgstr "Il report corrente è stato eliminato."
 
 #: lib/ex_automation_web/live/issue_live/show.ex:12
 #, elixir-autogen, elixir-format
 msgid "This is a issue record from your database."
-msgstr ""
+msgstr "Questo è un record di problema dal tuo database."
 
 #: lib/ex_automation_web/live/release_live/show.ex:12
 #, elixir-autogen, elixir-format
 msgid "This is a release record from your database."
-msgstr ""
+msgstr "Questo è un record di rilascio dal tuo database."
 
 #: lib/ex_automation_web/live/report_live/show.ex:11
 #, elixir-autogen, elixir-format
 msgid "This is a report record from your database."
-msgstr ""
+msgstr "Questo è un record di report dal tuo database."
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:74
 #, elixir-autogen, elixir-format
 msgid "Tip: If you prefer passwords, you can enable them in the user settings."
-msgstr ""
+msgstr "Suggerimento: Se preferisci le password, puoi abilitarle nelle impostazioni utente."
 
 #: lib/ex_automation_web/live/user_live/login.ex:33
 #, elixir-autogen, elixir-format
 msgid "To see sent emails, visit"
-msgstr ""
+msgstr "Per vedere le email inviate, visita"
 
 #: lib/ex_automation_web/live/issue_live/index.ex:30
 #: lib/ex_automation_web/live/issue_live/show.ex:27
 #, elixir-autogen, elixir-format
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: lib/ex_automation_web/live/report_live/form.ex:13
 #, elixir-autogen, elixir-format
 msgid "Use this form to manage report records in your database."
-msgstr ""
+msgstr "Usa questo modulo per gestire i record dei report nel tuo database."
 
 #: lib/ex_automation_web/live/user_live/confirmation.ex:12
 #, elixir-autogen, elixir-format
 msgid "Welcome %{email}"
-msgstr ""
+msgstr "Benvenuto %{email}"
 
 #: lib/ex_automation_web/live/report_live/form.ex:18
 #: lib/ex_automation_web/live/report_live/index.ex:46
 #: lib/ex_automation_web/live/report_live/show.ex:21
 #, elixir-autogen, elixir-format
 msgid "Year"
-msgstr ""
+msgstr "Anno"
 
 #: lib/ex_automation_web/live/report_live/show.ex:23
 #, elixir-autogen, elixir-format
 msgid "Yes"
-msgstr ""
+msgstr "Sì"
 
 #: lib/ex_automation_web/live/user_live/login.ex:31
 #, elixir-autogen, elixir-format
 msgid "You are running the local mail adapter."
-msgstr ""
+msgstr "Stai utilizzando l'adattatore di posta locale."
 
 #: lib/ex_automation_web/live/user_live/login.ex:16
 #, elixir-autogen, elixir-format
 msgid "You need to reauthenticate to perform sensitive actions on your account."
-msgstr ""
+msgstr "Devi riautenticarti per eseguire azioni sensibili sul tuo account."
 
 #: lib/ex_automation_web/live/user_live/login.ex:22
 #, elixir-autogen, elixir-format
 msgid "for an account now."
-msgstr ""
+msgstr "per un account ora."
 
 #: lib/ex_automation_web/live/report_live/show.ex:385
 #, elixir-autogen, elixir-format
 msgid "null"
-msgstr ""
+msgstr "nullo"
 
 #: lib/ex_automation_web/live/user_live/login.ex:59
 #, elixir-autogen, elixir-format
 msgid "or"
-msgstr ""
+msgstr "o"
 
 #: lib/ex_automation_web/live/user_live/login.ex:33
 #, elixir-autogen, elixir-format
 msgid "the mailbox page"
-msgstr ""
+msgstr "la pagina della casella di posta"
 
 #: lib/ex_automation_web/live/user_live/registration.ex:20
 #, elixir-autogen, elixir-format
 msgid "to your account now."
-msgstr ""
+msgstr "al tuo account ora."
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:39
 #, elixir-autogen, elixir-format
 msgid "Home"
-msgstr ""
+msgstr "Home"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:56
 #, elixir-autogen, elixir-format
 msgid "Log out"
-msgstr ""
+msgstr "Disconnetti"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:62
 #, elixir-autogen, elixir-format
 msgid "Register"
-msgstr ""
+msgstr "Registrati"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:42
 #, elixir-autogen, elixir-format
 msgid "Reports"
-msgstr ""
+msgstr "Report"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:51
 #, elixir-autogen, elixir-format
 msgid "Settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #: lib/ex_automation_web/components/layouts/root.html.heex:46
 #, elixir-autogen, elixir-format
 msgid "Workflows"
-msgstr ""
+msgstr "Flussi di Lavoro"
 
 #: lib/ex_automation_web/live/report_live/show.ex:123
 #, elixir-autogen, elixir-format
 msgid "CSV file generated successfully!"
-msgstr ""
+msgstr "File CSV generato con successo!"
 
 #: lib/ex_automation_web/live/report_live/show.ex:60
 #, elixir-autogen, elixir-format
 msgid "Download CSV"
-msgstr ""
+msgstr "Scarica CSV"
