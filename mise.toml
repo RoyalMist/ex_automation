@@ -1,6 +1,6 @@
 [tools]
 elixir = "1.18.4"
-erlang = "28.0.2"
+erlang = "28.0.3"
 ruby = "3.4.5"
 
 [env]
