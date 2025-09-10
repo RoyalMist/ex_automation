@@ -63,7 +63,7 @@ defmodule ExAutomation.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:req, "~> 0.5"},
       {:swoosh, "~> 1.16"},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.4", runtime: Mix.env() == :dev},
       {:tailwind_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
