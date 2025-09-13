@@ -40,7 +40,7 @@ defmodule ExAutomation.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:ecto_sql, "~> 3.13"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
-      {:gettext, "~> 0.26"},
+      {:gettext, "~> 1.0"},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.2.0",
